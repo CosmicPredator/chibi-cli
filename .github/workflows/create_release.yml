@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  release:
+  build_release:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
@@ -19,12 +19,62 @@ jobs:
 
       - name: Run Make
         run: make BUILD_TYPE=RELEASE
+      
+      - name: Tree Dir
+        run: tree
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with: 
           name: build_artifacts
           path: build
+  
+  build_win_installer:
+    needs: build_release
+    runs-on: windows-latest
+    permissions: write-all
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build_artifacts
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/
+      
+      - name: Rename Binary
+        shell: cmd
+        run: ren build\chibi_windows.exe chibi.exe
+      
+      - name: Pack Installer
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.5
+        with:
+          path: installer_scripts\chibi_setup.iss
+          options: /O+
+      
+      - name: Move installer to build dir
+        shell: cmd
+        run: move installer_scripts\Output\chibi_installer.exe build\
+      
+      - name: Upload Installer Artifacts
+        uses: actions/upload-artifact@v4
+        with: 
+          name: build_artifacts_with_installer
+          path: build
+  
+  create_release:
+    needs: build_win_installer
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
       - name: Read Version
         id: read_version
@@ -33,9 +83,17 @@ jobs:
           echo "Current tag: $TAG"
           echo "tag=$TAG" >> $GITHUB_ENV
       
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build_artifacts_with_installer
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/
+      
       - name: Tree Dir
         run: tree
-  
+
+      # TODO: Uncomment this at the end
       - name: Create Release
         id: create-release
         uses: comnoco/create-release-action@v2.0.5
