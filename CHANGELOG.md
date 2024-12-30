@@ -1,7 +1,11 @@
-### 🐛 Bug Fixes
-- Fixed an issue where if there are no entries, the `ls` command behaves weirdly.
+### ✨ What's New
+- You can now find the docs on https://chibi-cli.pages.dev/
+- You can now install chibi in windows via winget. To do so, type in
 
-### 🚸 Improvements
-- Added a `--version` flag where the current version of the app is printed out.
-- Added a command alias `list` for the `ls` command.
-- Added `--status` flag to the `ls` command where you can list anime/manga by status.
+  ```shell
+  winget install CosmicPredator.Chibi
+  ```
+- Added install/uninstall scripts for linux and macOS.
+
+### 🐛 Bug Fixes
+- Undo gitignoring `go.sum` for nix flake builds.
