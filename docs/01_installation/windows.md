@@ -6,7 +6,17 @@ lang: en-US
 # Windows
 This guide walks you through the steps to install and set up **chibi** on a Windows machine. Ensure you have administrative privileges to execute the necessary commands.
 
-## Installation Steps
+## Install using winget
+You can install chibi via `winget` using the below command:
+```shell
+PS C:\> winget install CosmicPredator.Chibi
+```
+
+## Install via windows installer
+You can also download the chibi installer from [here](https://github.com/CosmicPredator/chibi-cli/releases/latest) and run it.
+
+
+## Manual Installation
 1. **Download the Executable**
 
     Get the latest `.exe` file from the [Releases](https://github.com/CosmicPredator/chibi-cli/releases/latest) page.
@@ -41,5 +51,5 @@ This guide walks you through the steps to install and set up **chibi** on a Wind
 ## Next Steps
 With Chibi installed, you can proceed to [CLI Guide](../02_cli_guide/index) or explore available commands by typing:
 ```shell
-$ chibi --help
+PS C:\> chibi --help
 ```
