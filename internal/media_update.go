@@ -1,53 +1,100 @@
 package internal
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/CosmicPredator/chibi/types"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 )
 
-func getTotalEps(mediaId int) (int, error) {
-	query := `query ($id: Int) {
-        Media(id: $id) {
-            episodes
-            chapters
-            type
-        }
-    }`
+type MediaListUpdate struct {
+	Data struct {
+		AnimeListCollection ListCollection `json:"AnimeListCollection"`
+		MangaListCollection ListCollection `json:"MangaListCollection"`
+	} `json:"data"`
+}
 
-	var reponseData struct {
-		Data struct {
-			Media struct {
-				Episodes int    `json:"episodes"`
-				Chapters int    `json:"chapters"`
-				Type     string `json:"type"`
-			} `json:"media"`
-		} `json:"data"`
+func getTotalCurrent(mediaId int) (int, int, error) {
+	query := `query ($id: Int) {
+		AnimeListCollection: MediaListCollection(userId: $id, type: ANIME, status_in:[CURRENT, REPEATING]){
+			lists {
+				status
+				entries {
+					progress
+					media {
+						id
+						title {
+							userPreferred
+						}
+						episodes
+						chapters
+					}
+				}
+			}
+		}
+		MangaListCollection: MediaListCollection(userId: $id, type: MANGA, status_in:[CURRENT, REPEATING]){
+			lists {
+				status
+				entries {
+					progress
+					media {
+						id
+						title {
+							userPreferred
+						}
+						episodes
+						chapters
+					}
+				}
+			}
+		}
+	}`
+
+	tokenConfig := types.NewTokenConfig()
+	err := tokenConfig.ReadFromJsonFile()
+
+	if err != nil {
+		return 0, 0, err
 	}
 
+	var responseObj MediaListUpdate
+
 	anilistClient := NewAnilistClient()
-	err := anilistClient.ExecuteGraqhQL(
+	err = anilistClient.ExecuteGraqhQL(
 		query,
 		map[string]interface{}{
-			"id": mediaId,
+			"id": tokenConfig.UserId,
 		},
-		&reponseData,
+		&responseObj,
 	)
 
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 
-	if reponseData.Data.Media.Type == "ANIME" {
-		return reponseData.Data.Media.Episodes, nil
-	} else {
-		return reponseData.Data.Media.Chapters, nil
+	for _, list := range responseObj.Data.AnimeListCollection.Lists {
+		for _, entry := range list.Entries {
+			if entry.Media.Id == mediaId {
+				return entry.Progress, entry.Media.Episodes, nil
+			}
+		}
 	}
+
+	for _, list := range responseObj.Data.MangaListCollection.Lists {
+		for _, entry := range list.Entries {
+			if entry.Media.Id == mediaId {
+				return entry.Progress, entry.Media.Chapters, nil
+			}
+		}
+	}
+
+	return 0, 0, errors.New("list empty")
 }
 
 type updateMediaFields struct {
@@ -118,17 +165,38 @@ type MediaUpdate struct {
 	} `json:"data"`
 }
 
-func (mu *MediaUpdate) Get(isMediaAdd bool, mediaId int, progress int, status string, startDate string) error {
+func (mu *MediaUpdate) Get(isMediaAdd bool, mediaId int, progress string, status string, startDate string) error {
 	if status == "" {
 		status = "COMPLETED"
 	}
+	var accumulatedProgress int
+	current, total, err := getTotalCurrent(mediaId)
 
-	total, err := getTotalEps(mediaId)
+	if strings.Contains(progress, "+") || strings.Contains(progress, "-") {
+		if progress[:1] == "+" {
+			prgInt, _ := strconv.Atoi(progress[1:])
+			accumulatedProgress = current + prgInt
+		} else {
+			if current == 0 {
+				accumulatedProgress = 0
+			} else {
+				prgInt, _ := strconv.Atoi(progress[1:])
+				accumulatedProgress = current - prgInt
+			}
+		}
+	} else {
+		pgrInt, err := strconv.Atoi(progress)
+		if err != nil {
+			return err
+		}
+		accumulatedProgress = pgrInt
+	}
+
 	if err != nil {
 		return err
 	}
 
-	if progress > total {
+	if total != 0 && accumulatedProgress > total {
 		fmt.Println(lipgloss.NewStyle().Foreground(lipgloss.Color("#FF0000")).Render(
 			fmt.Sprintf("Entered value is greater than total episodes / chapters, which is %d", total),
 		))
@@ -199,7 +267,7 @@ func (mu *MediaUpdate) Get(isMediaAdd bool, mediaId int, progress int, status st
 
 	var canEditList bool = false
 
-	if progress == total {
+	if accumulatedProgress == total {
 		huh.NewConfirm().
 			Title("Seems like you completed the anime/manga. Do you want to mark this as completed?").
 			Affirmative("Yes!").
@@ -218,7 +286,7 @@ func (mu *MediaUpdate) Get(isMediaAdd bool, mediaId int, progress int, status st
 			mutation,
 			map[string]interface{}{
 				"id":       mediaId,
-				"progress": progress,
+				"progress": accumulatedProgress,
 				"score":    mediaFields.Score,
 				"notes":    mediaFields.Notes,
 				"cDate":    mediaFields.CompletedAtDate,
@@ -234,7 +302,7 @@ func (mu *MediaUpdate) Get(isMediaAdd bool, mediaId int, progress int, status st
 		mutation,
 		map[string]interface{}{
 			"id":       mediaId,
-			"progress": progress,
+			"progress": accumulatedProgress,
 		},
 		&mu,
 	)

@@ -41,19 +41,26 @@ func handleLs() {
 	}
 
 	rows := [][]string{}
-	for _, i := range mediaList.Data.MediaListCollection.Lists[0].Entries {
-		var progress string
-		if mediaType == "ANIME" {
-			progress = fmt.Sprintf("%d/%d", i.Progress, i.Media.Episodes)
-		} else {
-			progress = fmt.Sprintf("%d/%d", i.Progress, i.Media.Chapters)
-		}
 
-		rows = append(rows, []string{
-			strconv.Itoa(i.Media.Id),
-			i.Media.Title.UserPreferred,
-			progress,
-		})
+	for _, lists := range mediaList.Data.MediaListCollection.Lists {
+		for _, entry := range lists.Entries {
+			var progress string
+			if mediaType == "ANIME" {
+				progress = fmt.Sprintf("%d/%d", entry.Progress, entry.Media.Episodes)
+			} else {
+				progress = fmt.Sprintf("%d/%d", entry.Progress, entry.Media.Chapters)
+			}
+
+			if lists.Status == "REPEATING" {
+				entry.Media.Title.UserPreferred = "(R) " + entry.Media.Title.UserPreferred
+			}
+
+			rows = append(rows, []string{
+				strconv.Itoa(entry.Media.Id),
+				entry.Media.Title.UserPreferred,
+				progress,
+			})
+		}
 	}
 
 	// get size of terminal
@@ -85,9 +92,9 @@ func handleLs() {
 }
 
 var mediaListCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List your current anime/manga list",
-	Aliases: []string{ "ls" },
+	Use:     "list",
+	Short:   "List your current anime/manga list",
+	Aliases: []string{"ls"},
 	Run: func(cmd *cobra.Command, args []string) {
 		handleLs()
 	},
@@ -98,6 +105,6 @@ func init() {
 		&listMediaType, "type", "t", "anime", "Type of media. for anime, pass 'anime' or 'a', for manga, use 'manga' or 'm'",
 	)
 	mediaListCmd.Flags().StringVarP(
-		&listStatus, "status", "s", "watching", "Status of the media. Can be 'watching/w or reading/r', 'planning/p', 'completed/c', 'dropped/d', 'paused/ps', 'repeating/rp'",
+		&listStatus, "status", "s", "watching", "Status of the media. Can be 'watching/w or reading/r', 'planning/p', 'completed/c', 'dropped/d', 'paused/ps'",
 	)
 }
