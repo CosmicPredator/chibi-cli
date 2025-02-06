@@ -6,6 +6,7 @@ type MediaList struct {
 	Data struct {
 		MediaListCollection struct {
 			Lists []struct {
+				Status string `json:"status"`
 				Entries []struct {
 					Progress        int `json:"progress"`
 					ProgressVolumes int `json:"progressVolumes"`
@@ -36,8 +37,6 @@ func parseMediaStatus(status string) string {
 		return "DROPPED"
 	case "paused", "ps":
 		return "PAUSED"
-	case "repeating", "rp":
-		return "REPEATING"
 	default:
 		return "CURRENT"
 	}
@@ -53,9 +52,10 @@ func (ml *MediaList) Get(mediaType string, status string) error {
 	}
 
 	query :=
-		`query($userId: Int, $type: MediaType, $status: MediaListStatus) {
-        MediaListCollection(userId: $userId, type: $type, status: $status) {
+		`query($userId: Int, $type: MediaType, $status: [MediaListStatus]) {
+        MediaListCollection(userId: $userId, type: $type, status_in: $status) {
             lists {
+				status
                 entries {
                     progress
                     progressVolumes
@@ -73,12 +73,22 @@ func (ml *MediaList) Get(mediaType string, status string) error {
         }
     }`
 
+	parsedStatus := parseMediaStatus(status)
+
+	var parsedStatusSlice []string = make([]string, 0)
+
+	if parsedStatus == "CURRENT" {
+		parsedStatusSlice = append(parsedStatusSlice, parsedStatus, "REPEATING")
+	} else {
+		parsedStatusSlice = append(parsedStatusSlice, parsedStatus)
+	}
+
 	err = anilistClient.ExecuteGraqhQL(
 		query,
 		map[string]interface{}{
 			"type":   mediaType,
 			"userId": tokenConfig.UserId,
-			"status": parseMediaStatus(status),
+			"status": parsedStatusSlice,
 		},
 		&ml,
 	)
