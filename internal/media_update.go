@@ -184,6 +184,12 @@ func (mu *MediaUpdate) Get(isMediaAdd bool, mediaId int, progress string, status
 				accumulatedProgress = current - prgInt
 			}
 		}
+	} else {
+		pgrInt, err := strconv.Atoi(progress)
+		if err != nil {
+			return err
+		}
+		accumulatedProgress = pgrInt
 	}
 
 	if err != nil {
