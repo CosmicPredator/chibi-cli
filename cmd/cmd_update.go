@@ -9,18 +9,22 @@ import (
 )
 
 // TODO: Update progress relatively. For example "+2", "-10" etc.,
-var progress int
+var progress string
 
 func handleUpdate(mediaId int) {
 	CheckIfTokenExists()
-	if progress == 0 {
-		fmt.Println(
-			ERROR_MESSAGE_TEMPLATE.Render("The flag 'progress' should be greater than 0."),
-		)
+
+	progressInt, err := strconv.Atoi(progress)
+	if err == nil {
+		if progressInt == 0 {
+			fmt.Println(
+				ERROR_MESSAGE_TEMPLATE.Render("The flag 'progress' should be greater than 0."),
+			)
+		}
 	}
 
 	mediaUpdate := internal.NewMediaUpdate()
-	err := mediaUpdate.Get(false, mediaId, progress, "", "")
+	err = mediaUpdate.Get(false, mediaId, progress, "", "")
 
 	if err != nil {
 		ErrorMessage(err.Error())
@@ -35,8 +39,11 @@ func handleUpdate(mediaId int) {
 var mediaUpdateCmd = &cobra.Command{
 	Use:   "update [id]",
 	Short: "Update a list entry",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) == 2 {
+			progress = args[1]
+		}
 		id, err := strconv.Atoi(args[0])
 		if err != nil {
 			fmt.Println(
@@ -48,11 +55,11 @@ var mediaUpdateCmd = &cobra.Command{
 }
 
 func init() {
-	mediaUpdateCmd.Flags().IntVarP(
+	mediaUpdateCmd.Flags().StringVarP(
 		&progress,
 		"progress",
 		"p",
-		0,
+		"0",
 		"The number of episodes/chapter to update",
 	)
 }

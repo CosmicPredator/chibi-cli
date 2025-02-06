@@ -2,26 +2,28 @@ package internal
 
 import "github.com/CosmicPredator/chibi/types"
 
+type ListCollection struct {
+	Lists []struct {
+		Status string `json:"status"`
+		Entries []struct {
+			Progress        int `json:"progress"`
+			ProgressVolumes int `json:"progressVolumes"`
+			Media           struct {
+				Id    int `json:"id"`
+				Title struct {
+					UserPreferred string `json:"userPreferred"`
+				} `json:"title"`
+				Chapters int `json:"chapters"`
+				Volumes  int `json:"volumes"`
+				Episodes int `json:"episodes"`
+			} `json:"media"`
+		} `json:"entries"`
+	} `json:"lists"`
+}
+
 type MediaList struct {
 	Data struct {
-		MediaListCollection struct {
-			Lists []struct {
-				Status string `json:"status"`
-				Entries []struct {
-					Progress        int `json:"progress"`
-					ProgressVolumes int `json:"progressVolumes"`
-					Media           struct {
-						Id    int `json:"id"`
-						Title struct {
-							UserPreferred string `json:"userPreferred"`
-						} `json:"title"`
-						Chapters int `json:"chapters"`
-						Volumes  int `json:"volumes"`
-						Episodes int `json:"episodes"`
-					} `json:"media"`
-				} `json:"entries"`
-			} `json:"lists"`
-		} `json:"MediaListCollection"`
+		MediaListCollection ListCollection `json:"MediaListCollection"`
 	} `json:"data"`
 }
 

@@ -35,12 +35,12 @@ func handleMediaAdd(mediaId int) {
 	mediaUpdate := internal.NewMediaUpdate()
 	if mediaAddStatus == "CURRENT" {
 		currDate := fmt.Sprintf("%d/%d/%d", time.Now().Day(), time.Now().Month(), time.Now().Year())
-		err := mediaUpdate.Get(true, mediaId, 0, mediaAddStatus, currDate)
+		err := mediaUpdate.Get(true, mediaId, "0", mediaAddStatus, currDate)
 		if err != nil {
 			ErrorMessage(err.Error())
 		}
 	} else {
-		err := mediaUpdate.Get(true, mediaId, 0, mediaAddStatus, "")
+		err := mediaUpdate.Get(true, mediaId, "0", mediaAddStatus, "")
 		if err != nil {
 			ErrorMessage(err.Error())
 		}

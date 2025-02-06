@@ -63,21 +63,6 @@ func handleLs() {
 		}
 	}
 
-	for _, i := range mediaList.Data.MediaListCollection.Lists[0].Entries {
-		var progress string
-		if mediaType == "ANIME" {
-			progress = fmt.Sprintf("%d/%d", i.Progress, i.Media.Episodes)
-		} else {
-			progress = fmt.Sprintf("%d/%d", i.Progress, i.Media.Chapters)
-		}
-
-		rows = append(rows, []string{
-			strconv.Itoa(i.Media.Id),
-			i.Media.Title.UserPreferred,
-			progress,
-		})
-	}
-
 	// get size of terminal
 	tw, _, err := term.GetSize((os.Stdout.Fd()))
 	if err != nil {
