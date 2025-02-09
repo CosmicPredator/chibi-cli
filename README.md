@@ -2,6 +2,12 @@
 <h1>Chibi for AniList</h1>
 <h2>A lightweight anime & manga tracker CLI app powered by AniList</h2>
 
+<div align="center">
+<a href="https://snapcraft.io/chibi">
+    <img alt="Get it from the Snap Store" src=https://snapcraft.io/en/dark/install.svg />
+</a>
+</div>
+
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=flat&logo=go&logoColor=white)
 [![Build (Multiple Arch)](https://github.com/CosmicPredator/chibi-cli/actions/workflows/build.yml/badge.svg)](https://github.com/CosmicPredator/chibi-cli/actions/workflows/build.yml)
