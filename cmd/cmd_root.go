@@ -19,10 +19,7 @@ var rootCmd = &cobra.Command{
 			cmd.Help()
 		}
 	},
-}
-
-func init() {
-	rootCmd.Flags().BoolVarP(&isVersionCmd, "version", "v", false, "Prints the version of the app")
+	Version: appVersion,
 }
 
 func Execute(version string) {

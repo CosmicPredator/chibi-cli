@@ -34,3 +34,21 @@ var mediaListQuery = `query($userId: Int, $type: MediaType, $status: [MediaListS
         }
     }
 }`
+
+var viewerQuery = `query {
+    Viewer {
+        id
+        name
+        statistics {
+            anime {
+                count
+                minutesWatched
+            }
+            manga {
+                count
+                chaptersRead
+            }
+        }
+        siteUrl
+    }
+}`

@@ -13,10 +13,7 @@ import (
 type AuthRequest struct{}
 
 func (a AuthRequest) GetAuthURL() string {
-	return fmt.Sprintf(
-		"https://anilist.co/api/v2/oauth/authorize?client_id=%v&response_type=token",
-		CLIENT_ID,
-	)
+	return AUTH_URL
 }
 
 func (a AuthRequest) Login(authCode string) error {

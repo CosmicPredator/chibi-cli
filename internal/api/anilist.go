@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/CosmicPredator/chibi/internal/api/responses"
+	"github.com/CosmicPredator/chibi/types"
 )
 
 // Base URL is not gonna get changed for a while.
@@ -32,7 +33,15 @@ func queryAnilist(query string, variables map[string]any) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	tokenConfig := types.NewTokenConfig()
+	err = tokenConfig.ReadFromJsonFile()
+	if err != nil {
+		return nil, err
+	}
+
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer " + tokenConfig.AccessToken)
 
 	httpClient := &http.Client{}
 	resp, err := httpClient.Do(req)
@@ -93,6 +102,23 @@ func GetMediaList(userId int, mediaType string, mediaStatus string) (*responses.
 	}
 
 	var responseStruct responses.MediaList
+	err = json.Unmarshal(response, &responseStruct)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responseStruct, nil
+}
+
+// Herlper function to get details about the 
+// logged user
+func GetUserProfile() (*responses.Profile, error) {
+	response, err := queryAnilist(viewerQuery, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var responseStruct responses.Profile
 	err = json.Unmarshal(response, &responseStruct)
 	if err != nil {
 		return nil, err
