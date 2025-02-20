@@ -10,7 +10,7 @@ import (
 
 type LoginUI struct {
 	loginURL string
-	token string
+	token    string
 }
 
 // setter only method on loginURL field

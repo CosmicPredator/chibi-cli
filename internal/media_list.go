@@ -4,7 +4,7 @@ import "github.com/CosmicPredator/chibi/types"
 
 type ListCollection struct {
 	Lists []struct {
-		Status string `json:"status"`
+		Status  string `json:"status"`
 		Entries []struct {
 			Progress        int `json:"progress"`
 			ProgressVolumes int `json:"progressVolumes"`

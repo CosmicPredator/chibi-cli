@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -20,7 +21,7 @@ const baseURL = "https://graphql.anilist.co"
 // The response will be returned in []byte
 func queryAnilist(query string, variables map[string]any) ([]byte, error) {
 	payload := map[string]any{
-		"query": query,
+		"query":     query,
 		"variables": variables,
 	}
 
@@ -37,11 +38,11 @@ func queryAnilist(query string, variables map[string]any) ([]byte, error) {
 	tokenConfig := types.NewTokenConfig()
 	err = tokenConfig.ReadFromJsonFile()
 	if err != nil {
-		return nil, err
+		return nil, errors.New("not logged in. Please use \"chibi login\" to continue")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer " + tokenConfig.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+tokenConfig.AccessToken)
 
 	httpClient := &http.Client{}
 	resp, err := httpClient.Do(req)
@@ -67,9 +68,9 @@ func queryAnilist(query string, variables map[string]any) ([]byte, error) {
 // to be returned (perPage) and mediaType.
 // mediaType should be either "ANIME" or "MANGA"
 func SearchAnime(title string, perPage int, mediaType string) (*responses.MediaSearch, error) {
-	payload := map[string]any {
-		"title": title,
-		"perPage": perPage,
+	payload := map[string]any{
+		"title":     title,
+		"perPage":   perPage,
 		"mediaType": mediaType,
 	}
 
@@ -90,9 +91,9 @@ func SearchAnime(title string, perPage int, mediaType string) (*responses.MediaS
 // Helper function to perform media list.
 // Required mediaType as string and mediaStatus as string
 func GetMediaList(userId int, mediaType string, mediaStatus string) (*responses.MediaList, error) {
-	payload := map[string]any {
+	payload := map[string]any{
 		"userId": userId,
-		"type": mediaType,
+		"type":   mediaType,
 		"status": mediaStatus,
 	}
 
@@ -110,7 +111,7 @@ func GetMediaList(userId int, mediaType string, mediaStatus string) (*responses.
 	return &responseStruct, nil
 }
 
-// Herlper function to get details about the 
+// Herlper function to get details about the
 // logged user
 func GetUserProfile() (*responses.Profile, error) {
 	response, err := queryAnilist(viewerQuery, nil)

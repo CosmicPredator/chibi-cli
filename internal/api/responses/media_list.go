@@ -16,7 +16,6 @@ type ListCollection struct {
 				Episodes int `json:"episodes"`
 			} `json:"media"`
 		} `json:"entries"`
-		
 	} `json:"lists"`
 }
 

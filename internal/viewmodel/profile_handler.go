@@ -12,13 +12,13 @@ func HandleProfile() error {
 	}
 
 	profileUI := ui.ProfileUI{
-		Id: profile.Data.Viewer.Id,
-		Name: profile.Data.Viewer.Name,
-		TotalAnime: profile.Data.Viewer.Statistics.Anime.Count,
-		TotalManga: profile.Data.Viewer.Statistics.Manga.Count,
+		Id:             profile.Data.Viewer.Id,
+		Name:           profile.Data.Viewer.Name,
+		TotalAnime:     profile.Data.Viewer.Statistics.Anime.Count,
+		TotalManga:     profile.Data.Viewer.Statistics.Manga.Count,
 		MinutesWatched: profile.Data.Viewer.Statistics.Anime.MinutesWatched,
-		ChaptersRead: profile.Data.Viewer.Statistics.Manga.ChaptersRead,
-		SiteUrl: profile.Data.Viewer.SiteUrl,
+		ChaptersRead:   profile.Data.Viewer.Statistics.Manga.ChaptersRead,
+		SiteUrl:        profile.Data.Viewer.SiteUrl,
 	}
 
 	err = profileUI.Render()

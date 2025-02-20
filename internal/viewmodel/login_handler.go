@@ -12,7 +12,7 @@ import (
 func HandleLogin() error {
 	loginUI := ui.LoginUI{}
 	loginUI.SetLoginURL(internal.AUTH_URL)
-	
+
 	err := loginUI.Render()
 	if err != nil {
 		return err
@@ -26,7 +26,6 @@ func HandleLogin() error {
 		return err
 	}
 
-	internal.ACCESS_TOKEN = loginUI.GetAuthToken()
 	profile, err := api.GetUserProfile()
 	if err != nil {
 		return err
