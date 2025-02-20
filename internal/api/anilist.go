@@ -8,13 +8,10 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/CosmicPredator/chibi/internal"
 	"github.com/CosmicPredator/chibi/internal/api/responses"
-	"github.com/CosmicPredator/chibi/types"
+	"github.com/CosmicPredator/chibi/internal/db"
 )
-
-// Base URL is not gonna get changed for a while.
-// So, keeping it as constant is not gonna hurt anyone.
-const baseURL = "https://graphql.anilist.co"
 
 // Helper function to parse query string and variable map
 // and performs HTTP POST request to the AniList API.
@@ -30,19 +27,20 @@ func queryAnilist(query string, variables map[string]any) ([]byte, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", baseURL, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", internal.API_ENDPOINT, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return nil, err
 	}
 
-	tokenConfig := types.NewTokenConfig()
-	err = tokenConfig.ReadFromJsonFile()
+	dbConn := db.NewDbConn()
+	token, err := dbConn.Get("auth_token")
 	if err != nil {
+		println(err.Error())
 		return nil, errors.New("not logged in. Please use \"chibi login\" to continue")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+tokenConfig.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+token)
 
 	httpClient := &http.Client{}
 	resp, err := httpClient.Do(req)

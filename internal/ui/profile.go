@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/charmbracelet/lipgloss"
 )
@@ -51,15 +52,21 @@ func (p *ProfileUI) Render() error {
 	keyStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF79C6"))
 	valueStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#8BE9FD"))
 
-	// iterating over dataSlice and printing the KV pairs
+	var sb strings.Builder
+	
+	// iterating over dataSlice and adding the KV pairs to String Builder
 	// with appropriate padding
 	for _, kv := range dataSlice {
-		fmt.Printf(
-			"%s : %s\n",
-			keyStyle.MarginRight(maxKeyLen-len(kv.Key)).Render(kv.Key),
-			valueStyle.Render(kv.Value),
+		sb.WriteString(
+			fmt.Sprintf(
+				"%s : %s\n",
+				keyStyle.MarginRight(maxKeyLen-len(kv.Key)).Render(kv.Key),
+				valueStyle.Render(kv.Value),
+			),
 		)
 	}
 
+	// Display the output
+	fmt.Print(sb.String())
 	return nil
 }
