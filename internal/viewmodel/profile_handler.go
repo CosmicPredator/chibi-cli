@@ -6,11 +6,13 @@ import (
 )
 
 func HandleProfile() error {
+	// get profile info from API
 	profile, err := api.GetUserProfile()
 	if err != nil {
 		return err
 	}
 
+	// populate ProfileUI struct fields with the data from API
 	profileUI := ui.ProfileUI{
 		Id:             profile.Data.Viewer.Id,
 		Name:           profile.Data.Viewer.Name,
@@ -21,6 +23,7 @@ func HandleProfile() error {
 		SiteUrl:        profile.Data.Viewer.SiteUrl,
 	}
 
+	// display profile UI
 	err = profileUI.Render()
 	return err
 }

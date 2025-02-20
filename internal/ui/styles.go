@@ -2,6 +2,7 @@ package ui
 
 import "github.com/charmbracelet/lipgloss"
 
+// displays text in green with ✓ on the left
 func SuccessText(msg string) string {
 	return lipgloss.
 		NewStyle().
@@ -9,6 +10,7 @@ func SuccessText(msg string) string {
 		Render("✓ " + msg)
 }
 
+// displays text in red with ✘ on the left
 func ErrorText(err error) string {
 	return lipgloss.
 		NewStyle().
@@ -16,6 +18,7 @@ func ErrorText(err error) string {
 		Render("✘ Someting went wrong! Reason: ", err.Error())
 }
 
+// displays text in cyan foreground
 func HighlightedText(msg string) string {
 	return lipgloss.
 		NewStyle().
