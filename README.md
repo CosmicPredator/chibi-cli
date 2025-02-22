@@ -2,6 +2,13 @@
 <h1>Chibi for AniList</h1>
 <h2>A lightweight anime & manga tracker CLI app powered by AniList</h2>
 
+<div align=center>
+    <img width=150
+        src=https://i.imgur.com/qQ6Qs0v.png/>
+</div>
+
+<br>
+
 <div align="center">
 <a href="https://snapcraft.io/chibi">
     <img alt="Get it from the Snap Store" src=https://snapcraft.io/en/dark/install.svg />
@@ -16,7 +23,7 @@
 [![Build (Multiple Arch)](https://github.com/CosmicPredator/chibi-cli/actions/workflows/build.yml/badge.svg)](https://github.com/CosmicPredator/chibi-cli/actions/workflows/build.yml)
 [![Release (Multiple Arch)](https://github.com/CosmicPredator/chibi-cli/actions/workflows/create_release.yml/badge.svg?branch=prod)](https://github.com/CosmicPredator/chibi-cli/actions/workflows/create_release.yml)
 
-![Made with VHS](https://vhs.charm.sh/vhs-4o1iqUYYSVr7QIO5m9Q5nX.gif)
+<!-- ![Made with VHS](https://vhs.charm.sh/vhs-4o1iqUYYSVr7QIO5m9Q5nX.gif) -->
 
 </div>
 
