@@ -6,6 +6,9 @@
 <a href="https://snapcraft.io/chibi">
     <img alt="Get it from the Snap Store" src=https://snapcraft.io/en/dark/install.svg />
 </a>
+<a href="#windows-via-winget">
+    <img alt="Install for windows via winget" src=https://i.imgur.com/ENKa9Lv.png/>
+</a>
 </div>
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -34,6 +37,18 @@ This section provides the quickest way to get started with chibi-cli. For detail
 - Most modern terminals like **Windows Terminal**, **Gnome Terminal**, **Kitty** or **Alacritty** etc., should work.
 
 ### Quick Installation
+
+#### Linux (via snap store)
+```bash
+$ sudo snap install chibi
+```
+
+#### Windows (via winget)
+```pwsh
+PS C:\> winget install CosmicPredator.Chibi
+```
+
+#### Manual Installation
 - Download the binary for your OS from the [releases](https://github.com/CosmicPredator/chibi-cli/releases) page.
 
 - Open your favourite terminal in the directory where you downloaded chibi.
