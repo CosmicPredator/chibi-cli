@@ -3,8 +3,6 @@ name: Release (Multiple Arch)
 on:
   push:
     branches: [ prod ]
-  pull_request: 
-    branches: [ prod ]
   workflow_dispatch:
 
 jobs:
