@@ -1,107 +1,107 @@
 package db
 
 import (
-	"errors"
-	"fmt"
+	"database/sql"
 	"os"
 	"path"
-	"time"
 
 	"github.com/CosmicPredator/chibi/internal"
-	bolt "go.etcd.io/bbolt"
+	_ "github.com/mattn/go-sqlite3"
 )
 
-// define DbContext type to make CRUD operations
-type DbContext struct {}
+type DbContext struct {
+	dbConn *sql.DB
+}
 
-// creates a new bucket and if exists, it'll skip
-func (dc DbContext) createBucket() error {
-    db, err := dc.openDbConn()
-    defer db.Close()
-    if err != nil {
-        return err
-    }
-	return db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(internal.BOLT_BUCKET_NAME))
+// creates required SQL tables
+func (dc *DbContext) createRequiredTables() error {
+	tx, err := dc.dbConn.Begin()
+	if err != nil {
+		return err
+	}
+
+	if _, err = tx.Exec(QUERY_CREATE_TABLE); err != nil {
+		return err
+	}
+
+	if err = tx.Commit(); err != nil {
+		tx.Rollback()
+		return err
+	}
+	return nil
+}
+
+// initialize an SQL instance.
+// if isFirstTime is true, it'll clean the os config dir
+// and creates a brand new table
+func (dc *DbContext) Init(isFirstTime bool) error {
+	osConfigPath, _ := os.UserConfigDir()
+	configDir := path.Join(osConfigPath, "chibi")
+
+	if isFirstTime {
+		internal.CreateConfigDir()
+	}
+	dbPath := path.Join(configDir, "chibi_config.db")
+
+	db, err := sql.Open("sqlite3", dbPath)
+	if err != nil {
+		return err
+	}
+	dc.dbConn = db
+	if isFirstTime {
+		err := dc.createRequiredTables()
 		if err != nil {
 			return err
 		}
-		return nil
-	})
-}
-
-// cleans up and prepares os sepcific config folder
-// to save .db file
-func (dc DbContext) InitDB() error {
-	osConfigPath, _ := os.UserConfigDir()
-	configDir := path.Join(osConfigPath, "chibi")
-	_, err := os.Stat(configDir)
-
-	if err == nil {
-		os.RemoveAll(configDir)
 	}
-	os.MkdirAll(configDir, 0755)
-	return dc.createBucket()
+	return nil
 }
 
-// opens the .db file and returns the instance
-func (dc *DbContext) openDbConn() (*bolt.DB, error) {
-	osConfigDir, _ := os.UserConfigDir()
-	configFilePath := path.Join(osConfigDir, "chibi", internal.BOLT_DB_NAME)
+// add a key value pair to config table
+func (dc *DbContext) SetConfig(key string, value string) error {
+	tx, err := dc.dbConn.Begin()
+	if err != nil {
+		return err
+	}
 
-	db, err := bolt.Open(configFilePath, 0755, &bolt.Options{
-        Timeout: 5 * time.Second,
-    })
+	if _, err = tx.Exec(QUERY_INSERT_CONFIG, key, value); err != nil {
+		return err
+	}
+
+	if err = tx.Commit(); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return nil
+}
+
+// gets a key's value from the config table
+func (dc *DbContext) GetConfig(key string) (*string, error) {
+	tx, err := dc.dbConn.Begin()
 	if err != nil {
 		return nil, err
 	}
-	return db, nil
-}
 
-// writes the key value pair to db
-func (dc DbContext) Set(key string, value string) error {
-    db, err := dc.openDbConn()
-    defer db.Close()
-    if err != nil {
-        return err
-    }
-	err = db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(internal.BOLT_BUCKET_NAME))
-		if b == nil {
-			return errors.New("DB Bucket does not exist")
-		}
-		err := b.Put([]byte(key), []byte(value))
-		return err
-	})
-	return err
-}
-
-// reads the value of specified key from db
-func (dc DbContext) Get(key string) (string, error) {
-    db, err := dc.openDbConn()
-    defer db.Close()
-    if err != nil {
-        return "", err
-    }
-
+	row := tx.QueryRow(QUERY_GET_CONFIG, key)
 	var value string
-	err = db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(internal.BOLT_BUCKET_NAME))
-		if b == nil {
-			return errors.New("DB Bucket does not exist")
-		}
-		value = string(b.Get([]byte(key)))
-		if value == "" {
-			return fmt.Errorf("no value found for the key %s", key)
-		}
-		return nil
-	})
-	if err != nil {
-		return "", err
+
+	if err = row.Scan(&value); err != nil {
+		return nil, err
 	}
-	return value, err
+
+	if err = tx.Commit(); err != nil {
+		return nil, err
+	}
+	return &value, nil
 }
 
+// closes the DB instance after usage
+func (dc *DbContext) Close() {
+	dc.dbConn.Close()
+}
+
+// returns a brand new DbContext instance
 func NewDbConn() *DbContext {
 	return &DbContext{}
 }

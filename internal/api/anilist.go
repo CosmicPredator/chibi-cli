@@ -33,14 +33,20 @@ func queryAnilist(query string, variables map[string]any) ([]byte, error) {
 	}
 
 	dbConn := db.NewDbConn()
-	token, err := dbConn.Get("auth_token")
+	defer dbConn.Close()
+
+	err = dbConn.Init(false)
 	if err != nil {
-		println(err.Error())
+		return nil, err
+	}
+
+	token, err := dbConn.GetConfig("auth_token")
+	if err != nil {
 		return nil, errors.New("not logged in. Please use \"chibi login\" to continue")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Authorization", "Bearer "+*token)
 
 	httpClient := &http.Client{}
 	resp, err := httpClient.Do(req)

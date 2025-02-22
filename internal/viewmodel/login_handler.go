@@ -21,13 +21,15 @@ func HandleLogin() error {
 	}
 
 	dbConn := db.NewDbConn()
-	err = dbConn.InitDB()
+	defer dbConn.Close()
+	
+	err = dbConn.Init(true)
 	if err != nil {
 		return err
 	}
 
 	// write access token to db
-	err = dbConn.Set("auth_token", loginUI.GetAuthToken())
+	err = dbConn.SetConfig("auth_token", loginUI.GetAuthToken())
 	if err != nil {
 		return err
 	}
@@ -39,12 +41,12 @@ func HandleLogin() error {
 		return err
 	}
 
-	err = dbConn.Set("user_id", strconv.Itoa(profile.Data.Viewer.Id))
+	err = dbConn.SetConfig("user_id", strconv.Itoa(profile.Data.Viewer.Id))
 	if err != nil {
 		return err
 	}
 
-	err = dbConn.Set("user_name", profile.Data.Viewer.Name)
+	err = dbConn.SetConfig("user_name", profile.Data.Viewer.Name)
 	if err != nil {
 		return err
 	}
