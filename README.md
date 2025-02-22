@@ -1,13 +1,11 @@
-<div align="center">
-<h1>Chibi for AniList</h1>
-<h2>A lightweight anime & manga tracker CLI app powered by AniList</h2>
-
 <div align=center>
     <img width=150
         src=https://i.imgur.com/qQ6Qs0v.png/>
 </div>
 
-<br>
+<div align="center">
+<h1>Chibi for AniList</h1>
+<h2>A lightweight anime & manga tracker CLI app powered by AniList</h2>
 
 <div align="center">
 <a href="https://snapcraft.io/chibi">
