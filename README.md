@@ -11,6 +11,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=flat&logo=go&logoColor=white)
 [![Build (Multiple Arch)](https://github.com/CosmicPredator/chibi-cli/actions/workflows/build.yml/badge.svg)](https://github.com/CosmicPredator/chibi-cli/actions/workflows/build.yml)
+[![Release (Multiple Arch)](https://github.com/CosmicPredator/chibi-cli/actions/workflows/create_release.yml/badge.svg?branch=prod)](https://github.com/CosmicPredator/chibi-cli/actions/workflows/create_release.yml)
 
 ![Made with VHS](https://vhs.charm.sh/vhs-4o1iqUYYSVr7QIO5m9Q5nX.gif)
 
