@@ -72,6 +72,6 @@ func MediaFormatFormatter(mediaFormat string) string {
 	case "ONE_SHOT":
 		return "One Shot"
 	default:
-		return ""
+		return "?"
 	}
 }

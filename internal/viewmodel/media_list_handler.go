@@ -36,7 +36,7 @@ func HandleMediaList(mediaType, mediaStatus string) error {
 	}
 
 	mediaList, err := api.GetMediaList(
-		userIdInt, mediaType, mediaStatuIn,
+		userIdInt, mediaStatuIn,
 	)
 	if err != nil {
 		return err

@@ -1,6 +1,6 @@
 package api
 
-var searchMediaQuery = `query($searchQuery: String, $perPage: Int, $mediaType: MediaType) {
+const searchMediaQuery = `query($searchQuery: String, $perPage: Int, $mediaType: MediaType) {
     Page(perPage: $perPage) {
         media(search: $searchQuery, type: $mediaType) {
             id
@@ -14,7 +14,7 @@ var searchMediaQuery = `query($searchQuery: String, $perPage: Int, $mediaType: M
     }
 }`
 
-var mediaListQuery = `query ($id: Int, $statusIn: [MediaListStatus]) {
+const mediaListQuery = `query ($id: Int, $statusIn: [MediaListStatus]) {
 	AnimeListCollection: MediaListCollection(userId: $id, type: ANIME, status_in:$statusIn){
 		lists {
 			status
@@ -51,7 +51,7 @@ var mediaListQuery = `query ($id: Int, $statusIn: [MediaListStatus]) {
 	}
 }`
 
-var viewerQuery = `query {
+const viewerQuery = `query {
     Viewer {
         id
         name

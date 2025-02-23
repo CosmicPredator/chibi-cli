@@ -95,7 +95,7 @@ func SearchMedia(title string, perPage int, mediaType string) (*responses.MediaS
 
 // Helper function to perform media list.
 // Required mediaType as string and mediaStatus as string
-func GetMediaList(userId int, mediaType string, mediaStatusIn []string) (*responses.MediaList, error) {
+func GetMediaList(userId int, mediaStatusIn []string) (*responses.MediaList, error) {
 	payload := map[string]any{
 		"id":       userId,
 		"statusIn": mediaStatusIn,
@@ -124,6 +124,21 @@ func GetUserProfile() (*responses.Profile, error) {
 	}
 
 	var responseStruct responses.Profile
+	err = json.Unmarshal(response, &responseStruct)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responseStruct, nil
+}
+
+func UpdateMediaEntry(params map[string]any) (*responses.MediaUpdateResponse, error) {
+	response, err := queryAnilist(mediaEntryUpdateMutation, params)
+	if err != nil {
+		return nil, err
+	}
+
+	var responseStruct responses.MediaUpdateResponse
 	err = json.Unmarshal(response, &responseStruct)
 	if err != nil {
 		return nil, err
