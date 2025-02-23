@@ -11,9 +11,9 @@ type ListCollection struct {
 				Title struct {
 					UserPreferred string `json:"userPreferred"`
 				} `json:"title"`
-				Chapters int `json:"chapters"`
-				Volumes  int `json:"volumes"`
-				Episodes int `json:"episodes"`
+				Chapters *int `json:"chapters"`
+				Volumes  *int `json:"volumes"`
+				Episodes *int `json:"episodes"`
 			} `json:"media"`
 		} `json:"entries"`
 	} `json:"lists"`

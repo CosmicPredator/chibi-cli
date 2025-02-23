@@ -14,12 +14,15 @@ var rootCmd = &cobra.Command{
 	Long: "Chibi for AniList - A lightweight anime & manga tracker CLI app powered by AniList.",
 	Run: func(cmd *cobra.Command, args []string) {
 		if isVersionCmd {
-			fmt.Println(SUCCESS_MESSAGE_TEMPLATE.Render(appVersion))
+			fmt.Printf("chibi version %s\n", appVersion)
 		} else {
 			cmd.Help()
 		}
 	},
-	Version: appVersion,
+}
+
+func init() {
+	rootCmd.Flags().BoolVarP(&isVersionCmd, "version", "v", false, "prints the version of chibi")
 }
 
 func Execute(version string) {

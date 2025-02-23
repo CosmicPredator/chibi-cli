@@ -34,7 +34,7 @@ func (dc *DbContext) createRequiredTables() error {
 // initialize an SQL instance.
 // if isFirstTime is true, it'll clean the os config dir
 // and creates a brand new table
-func (dc *DbContext) Init(isFirstTime bool) error {
+func (dc *DbContext) init(isFirstTime bool) error {
 	osConfigPath, _ := os.UserConfigDir()
 	configDir := path.Join(osConfigPath, "chibi")
 
@@ -102,6 +102,11 @@ func (dc *DbContext) Close() {
 }
 
 // returns a brand new DbContext instance
-func NewDbConn() *DbContext {
-	return &DbContext{}
+func NewDbConn(isFirstTime bool) (*DbContext, error) {
+	dbContext := DbContext{}
+	err := dbContext.init(isFirstTime)
+	if err != nil {
+		return nil, err
+	}
+	return &dbContext, nil
 }

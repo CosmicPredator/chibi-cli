@@ -13,26 +13,39 @@ var searchMediaQuery = `query($searchQuery: String, $perPage: Int, $mediaType: M
     }
 }`
 
-var mediaListQuery = `query($userId: Int, $type: MediaType, $status: [MediaListStatus]) {
-    MediaListCollection(userId: $userId, type: $type, status_in: $status) {
-        lists {
+var mediaListQuery = `query ($id: Int, $statusIn: [MediaListStatus]) {
+	AnimeListCollection: MediaListCollection(userId: $id, type: ANIME, status_in:$statusIn){
+		lists {
 			status
-            entries {
-                progress
-                progressVolumes
-                media {
-                    id
-                    title {
-                        userPreferred
-                    }
-                    type
-                    chapters
-                    volumes
-                    episodes
-                }
-            }
-        }
-    }
+			entries {
+				progress
+				media {
+					id
+					title {
+						userPreferred
+					}
+					episodes
+					chapters
+				}
+			}
+		}
+	}
+	MangaListCollection: MediaListCollection(userId: $id, type: MANGA, status_in:$statusIn){
+		lists {
+			status
+			entries {
+				progress
+				media {
+					id
+					title {
+						userPreferred
+					}
+					episodes
+					chapters
+				}
+			}
+		}
+	}
 }`
 
 var viewerQuery = `query {

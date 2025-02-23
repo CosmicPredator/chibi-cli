@@ -20,13 +20,11 @@ func HandleLogin() error {
 		return err
 	}
 
-	dbConn := db.NewDbConn()
-	defer dbConn.Close()
-	
-	err = dbConn.Init(true)
+	dbConn, err := db.NewDbConn(true)
 	if err != nil {
 		return err
 	}
+	defer dbConn.Close()
 
 	// write access token to db
 	err = dbConn.SetConfig("auth_token", loginUI.GetAuthToken())

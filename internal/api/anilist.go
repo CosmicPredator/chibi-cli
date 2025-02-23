@@ -32,13 +32,11 @@ func queryAnilist(query string, variables map[string]any) ([]byte, error) {
 		return nil, err
 	}
 
-	dbConn := db.NewDbConn()
-	defer dbConn.Close()
-
-	err = dbConn.Init(false)
+	dbConn, err := db.NewDbConn(false)
 	if err != nil {
 		return nil, err
 	}
+	defer dbConn.Close()
 
 	token, err := dbConn.GetConfig("auth_token")
 	if err != nil {
@@ -94,11 +92,10 @@ func SearchAnime(title string, perPage int, mediaType string) (*responses.MediaS
 
 // Helper function to perform media list.
 // Required mediaType as string and mediaStatus as string
-func GetMediaList(userId int, mediaType string, mediaStatus string) (*responses.MediaList, error) {
+func GetMediaList(userId int, mediaType string, mediaStatusIn []string) (*responses.MediaList, error) {
 	payload := map[string]any{
-		"userId": userId,
-		"type":   mediaType,
-		"status": mediaStatus,
+		"id": userId,
+		"statusIn": mediaStatusIn,
 	}
 
 	response, err := queryAnilist(mediaListQuery, payload)
