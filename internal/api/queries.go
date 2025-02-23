@@ -9,6 +9,7 @@ var searchMediaQuery = `query($searchQuery: String, $perPage: Int, $mediaType: M
             }
 			type
             averageScore
+			format
         }
     }
 }`
@@ -26,6 +27,7 @@ var mediaListQuery = `query ($id: Int, $statusIn: [MediaListStatus]) {
 					}
 					episodes
 					chapters
+					format
 				}
 			}
 		}
@@ -42,6 +44,7 @@ var mediaListQuery = `query ($id: Int, $statusIn: [MediaListStatus]) {
 					}
 					episodes
 					chapters
+					format
 				}
 			}
 		}

@@ -14,6 +14,7 @@ type ListCollection struct {
 				Chapters *int `json:"chapters"`
 				Volumes  *int `json:"volumes"`
 				Episodes *int `json:"episodes"`
+				MediaFormat string `json:"format"`
 			} `json:"media"`
 		} `json:"entries"`
 	} `json:"lists"`

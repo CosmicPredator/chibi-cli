@@ -69,11 +69,14 @@ func queryAnilist(query string, variables map[string]any) ([]byte, error) {
 // Requires rough title as string, number of results
 // to be returned (perPage) and mediaType.
 // mediaType should be either "ANIME" or "MANGA"
-func SearchAnime(title string, perPage int, mediaType string) (*responses.MediaSearch, error) {
+func SearchMedia(title string, perPage int, mediaType string) (*responses.MediaSearch, error) {
+	if perPage > 50 {
+		return nil, errors.New("only a maximum of 50 results can be returned")
+	}
 	payload := map[string]any{
-		"title":     title,
-		"perPage":   perPage,
-		"mediaType": mediaType,
+		"searchQuery": title,
+		"perPage":     perPage,
+		"mediaType":   mediaType,
 	}
 
 	response, err := queryAnilist(searchMediaQuery, payload)
@@ -94,7 +97,7 @@ func SearchAnime(title string, perPage int, mediaType string) (*responses.MediaS
 // Required mediaType as string and mediaStatus as string
 func GetMediaList(userId int, mediaType string, mediaStatusIn []string) (*responses.MediaList, error) {
 	payload := map[string]any{
-		"id": userId,
+		"id":       userId,
 		"statusIn": mediaStatusIn,
 	}
 

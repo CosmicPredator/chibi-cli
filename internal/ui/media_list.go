@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-
+	
 	"github.com/CosmicPredator/chibi/internal"
 	"github.com/CosmicPredator/chibi/internal/api/responses"
 	"github.com/charmbracelet/lipgloss"
@@ -39,7 +39,7 @@ func (l *MediaListUI) renderTable(rows ...[]string) (*table.Table, error) {
 					Align(lipgloss.Center)
 			}
 
-			if row % 2 == 0 && (col == 0 || col == 2) {
+			if row % 2 == 0 && (col == 0 || col == 2 || col == 3) {
 				return lipgloss.NewStyle().Align(lipgloss.Center).Faint(true)
 			}
 
@@ -50,7 +50,7 @@ func (l *MediaListUI) renderTable(rows ...[]string) (*table.Table, error) {
 					Align(lipgloss.Center).
 					PaddingLeft(1).
 					PaddingRight(1).
-					Width((tw - 6) / 3)
+					Width((tw - 6) / 3).Inline(true)
 				if row % 2 == 0 {
 					colStyle = colStyle.Faint(true)
 				}
@@ -59,7 +59,7 @@ func (l *MediaListUI) renderTable(rows ...[]string) (*table.Table, error) {
 
 			return lipgloss.NewStyle().Align(lipgloss.Center).PaddingLeft(2).PaddingRight(2)
 		}).
-		Headers("ID", "TITLE", "PROGRESS").
+		Headers("ID", "TITLE", "FORMAT", "PROGRESS").
 		Rows(rows...).Width(tw)
 
 	return table, nil
@@ -102,10 +102,11 @@ func (l *MediaListUI) Render() error {
 			if list.Status == "REPEATING" {
 				entry.Media.Title.UserPreferred = "(R) " + entry.Media.Title.UserPreferred
 			}
-
+ 
 			rows = append(rows, []string{
 				strconv.Itoa(entry.Media.Id),
 				entry.Media.Title.UserPreferred,
+				internal.MediaFormatFormatter(entry.Media.MediaFormat),
 				progress,
 			})
 		}

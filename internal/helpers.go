@@ -48,3 +48,30 @@ func MediaStatusEnumMapper(mediaStatus string) string {
 		return "CURRENT"
 	}
 }
+
+func MediaFormatFormatter(mediaFormat string) string {
+	switch mediaFormat {
+	case "TV":
+		return "Tv"
+	case "TV_SHORT":
+		return "Tv Short"
+	case "MOVIE":
+		return "Movie"
+	case "SPECIAL":
+		return "Special"
+	case "OVA":
+		return "Ova"
+	case "ONA":
+		return "Ona"
+	case "MUSIC":
+		return "Music"
+	case "MANGA":
+		return "Manga"
+	case "NOVEL":
+		return "Novel"
+	case "ONE_SHOT":
+		return "One Shot"
+	default:
+		return ""
+	}
+}
