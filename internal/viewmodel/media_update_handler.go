@@ -1,14 +1,18 @@
 package viewmodel
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/CosmicPredator/chibi/internal"
 	"github.com/CosmicPredator/chibi/internal/api"
 	"github.com/CosmicPredator/chibi/internal/api/responses"
 	"github.com/CosmicPredator/chibi/internal/db"
 	"github.com/CosmicPredator/chibi/internal/ui"
+	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/huh/spinner"
 )
 
@@ -57,14 +61,132 @@ func getCurrentProgress(userId int, mediaId int) (current int, total *int, err e
 	return
 }
 
-// func handleNewAddition(params MediaUpdateParams) error {
-// 	return nil
-// }
+func handleNewAddition(params MediaUpdateParams) error {
+	payload := map[string]any{
+		"id": params.MediaId,
+		"status": internal.MediaStatusEnumMapper(params.Status),
+	}
+
+	if params.StartDate != "" {
+		startDateRaw, err := time.Parse("02/01/2006", params.StartDate)
+		if err != nil {
+			return err
+		}
+
+		if params.Status == "CURRENT" {
+			payload["sDate"] = startDateRaw.Day()
+			payload["sMonth"] = int(startDateRaw.Month())
+			payload["sYear"] = startDateRaw.Year()
+		}
+	}
+
+	var response *responses.MediaUpdateResponse
+	var err error
+	err = ui.ActionSpinner("Adding entry...", func(ctx context.Context) error {
+		response, err = api.UpdateMediaEntry(payload)
+		return err
+	})
+	if err != nil {
+		return err
+	}
+
+	var statusString string
+	if internal.MediaStatusEnumMapper(params.Status) == "CURRENT" {
+		statusString = "watching"
+	} else {
+		statusString = strings.ToLower(internal.MediaStatusEnumMapper(params.Status))
+	}
+
+	fmt.Println(
+		ui.SuccessText(
+			fmt.Sprintf(
+				"Added %s to %s", 
+				response.Data.SaveMediaListEntry.Media.Title.UserPreferred,
+				statusString,
+			),
+		),
+	)
+
+	return nil
+}
+
+func handleMediaCompletedAction(params MediaUpdateParams, progress int) error {
+	currDate := fmt.Sprintf("%d/%02d/%d\n", time.Now().Day(), time.Now().Month(), time.Now().Year())
+	var scoreString string
+	var notes string
+
+	huh.NewForm(
+		huh.NewGroup(
+			huh.NewInput().
+				Title("Completed Date").
+				Value(&currDate).
+				Description("Date should be in format DD/MM/YYYY").
+				Validate(func(s string) error {
+					layout := "02/01/2006"
+					_, err := time.Parse(layout, strings.TrimSpace(s))
+					return err
+				}),
+		),
+		huh.NewGroup(
+			huh.NewText().
+				Title("Notes").
+				Description("Note: you can add multiple lines").
+				Value(&notes),
+		),
+		huh.NewGroup(
+			huh.NewInput().
+				Title("Score").
+				Description("If your score is in emoji, type 1 for 😞, 2 for 😐 and 3 for 😊").
+				Prompt("> ").
+				Validate(func(s string) error {
+					_, err := strconv.ParseFloat(s, 64)
+					return err
+				}).
+				Value(&scoreString),
+		),
+	).Run()
+	completedDate, err := time.Parse("02/01/2006", strings.TrimSpace(currDate))
+	if err != nil {
+		return err
+	}
+	scoreFloat, err := strconv.ParseFloat(scoreString, 32)
+	if err != nil {
+		return err
+	}
+
+	var response *responses.MediaUpdateResponse
+	err = ui.ActionSpinner("Marking as completed...", func(ctx context.Context) error {
+		response, err = api.UpdateMediaEntry(map[string]any{
+			"id":       params.MediaId,
+			"progress": progress,
+			"score":    scoreFloat,
+			"notes":    notes,
+			"cDate":    completedDate.Day(),
+			"cMonth":   int(completedDate.Month()),
+			"cYear":    completedDate.Year(),
+		})
+		return err
+	})
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(
+	ui.SuccessText(
+		fmt.Sprintf(
+			"Marked %s as completed",
+			response.Data.SaveMediaListEntry.Media.Title.UserPreferred),
+		),
+	)
+
+	return nil
+}
 
 func HandleMediaUpdate(params MediaUpdateParams) error {
-	// if params.IsNewAddition {
-	// 	handleNewAddition(params)
-	// }
+	if params.IsNewAddition {
+		handleNewAddition(params)
+		return nil
+	}
 
 	dbCtx, err := db.NewDbConn(false)
 	if err != nil {
@@ -86,20 +208,32 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 		return err
 	}
 
-	if total != nil && *total != 0 && accumulatedProgress > *total {
-		return fmt.Errorf("entered value is greater than total episodes / chapters, which is %d", total)
+	if total != nil {
+		if *total != 0 && accumulatedProgress > *total {
+			return fmt.Errorf("entered value is greater than total episodes / chapters, which is %d", *total)
+		}
+		
+		if accumulatedProgress == *total {
+			var markAsCompleted string
+			fmt.Print("Mark as media completed (y/N)? ")
+			fmt.Scan(&markAsCompleted)
+
+			if strings.ToLower(markAsCompleted) == "y" {
+				err = handleMediaCompletedAction(params, accumulatedProgress)
+				return err
+			}
+			return nil
+		}
 	}
 
 	var response *responses.MediaUpdateResponse
-	err = spinner.New().Title("Updating entry...").Action(func() {
+	err = ui.ActionSpinner("Updating entry...", func(ctx context.Context) error {
 		response, err = api.UpdateMediaEntry(map[string]any{
 			"id": params.MediaId,
 			"progress": accumulatedProgress,
 		})
-	}).Run()
-	if err != nil {
 		return err
-	}
+	})
 
 	fmt.Println(
 		ui.SuccessText(

@@ -6,7 +6,7 @@ import (
 	"path"
 
 	"github.com/CosmicPredator/chibi/internal"
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 type DbContext struct {
@@ -43,7 +43,7 @@ func (dc *DbContext) init(isFirstTime bool) error {
 	}
 	dbPath := path.Join(configDir, "chibi_config.db")
 
-	db, err := sql.Open("sqlite3", dbPath)
+	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return err
 	}

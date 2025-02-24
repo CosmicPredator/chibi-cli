@@ -1,10 +1,11 @@
 package viewmodel
 
 import (
+	"context"
+
 	"github.com/CosmicPredator/chibi/internal/api"
 	"github.com/CosmicPredator/chibi/internal/api/responses"
 	"github.com/CosmicPredator/chibi/internal/ui"
-	"github.com/charmbracelet/huh/spinner"
 )
 
 func HandleProfile() error {
@@ -12,9 +13,10 @@ func HandleProfile() error {
 	var err error
 
 	// get profile info from API
-	err = spinner.New().Title("Fetching profile...").Action(func() {
+	err = ui.ActionSpinner("Fetching profile...", func(ctx context.Context) error {
 		profile, err = api.GetUserProfile()
-	}).Run()
+		return err
+	})
 	if err != nil {
 		return err
 	}

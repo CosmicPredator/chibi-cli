@@ -1,6 +1,11 @@
 package ui
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	"context"
+
+	"github.com/charmbracelet/huh/spinner"
+	"github.com/charmbracelet/lipgloss"
+)
 
 // displays text in green with ✓ on the left
 func SuccessText(msg string) string {
@@ -26,4 +31,14 @@ func HighlightedText(msg string) string {
 		PaddingLeft(0).
 		PaddingRight(0).
 		Render(msg)
+}
+
+// displays spinner while the supplied action
+// func is getting executed
+func ActionSpinner(title string, action func(context.Context) error) error {
+	return spinner.
+		New().
+		Title(title).
+		ActionWithErr(action).
+		Run()
 }

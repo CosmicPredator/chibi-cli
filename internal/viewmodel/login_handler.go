@@ -1,11 +1,13 @@
 package viewmodel
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 
 	"github.com/CosmicPredator/chibi/internal"
 	"github.com/CosmicPredator/chibi/internal/api"
+	"github.com/CosmicPredator/chibi/internal/api/responses"
 	"github.com/CosmicPredator/chibi/internal/db"
 	"github.com/CosmicPredator/chibi/internal/ui"
 )
@@ -34,7 +36,11 @@ func HandleLogin() error {
 
 	// gets user profile details from api and saves 
 	// the username and ID to db
-	profile, err := api.GetUserProfile()
+	var profile *responses.Profile
+	err = ui.ActionSpinner("Logging In...", func(ctx context.Context) error {
+		profile, err = api.GetUserProfile()
+		return err
+	})
 	if err != nil {
 		return err
 	}
