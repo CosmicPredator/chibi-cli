@@ -78,6 +78,14 @@ func handleNewAddition(params MediaUpdateParams) error {
 			payload["sMonth"] = int(startDateRaw.Month())
 			payload["sYear"] = startDateRaw.Year()
 		}
+	} else {
+		startDate := time.Now()
+
+		if params.Status == "CURRENT" {
+			payload["sDate"] = startDate.Day()
+			payload["sMonth"] = int(startDate.Month())
+			payload["sYear"] = startDate.Year()
+		}
 	}
 
 	var response *responses.MediaUpdateResponse
