@@ -75,7 +75,7 @@ func init() {
 		&progress,
 		"progress",
 		"p",
-		"0",
+		"",
 		"The number of episodes/chapter to update",
 	)
 }

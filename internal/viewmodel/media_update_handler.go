@@ -248,6 +248,9 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 
 func parseRelativeProgress(progress string, current int) (int, error) {
 	var accumulatedProgress int
+	if len(progress) == 0 {
+		return current, nil
+	}
 	if strings.Contains(progress, "+") || strings.Contains(progress, "-") {
 		if progress[:1] == "+" {
 			prgInt, _ := strconv.Atoi(progress[1:])
