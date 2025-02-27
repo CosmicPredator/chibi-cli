@@ -207,6 +207,21 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 		return err
 	}
 
+	status := internal.MediaStatusEnumMapper(params.Status)
+	if status == "COMPLETED" {
+		if *total != 0 && accumulatedProgress < *total {
+			var markAsCompleted string
+			fmt.Print("Accumulated progress is less than total episodes / chapters. Mark as media completed (y/N)? ")
+			fmt.Scan(&markAsCompleted)
+
+			if strings.ToLower(markAsCompleted) != "y" {
+				return nil
+			}
+		}
+		err = handleMediaCompletedAction(params, accumulatedProgress)
+		return err
+	}
+
 	if total != nil {
 		if *total != 0 && accumulatedProgress > *total {
 			return fmt.Errorf("entered value is greater than total episodes / chapters, which is %d", *total)
@@ -230,6 +245,7 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 		response, err = api.UpdateMediaEntry(map[string]any{
 			"id":       params.MediaId,
 			"progress": accumulatedProgress,
+			"status":   status,
 		})
 		return err
 	})

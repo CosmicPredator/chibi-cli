@@ -11,6 +11,7 @@ import (
 
 // // TODO: Update progress relatively. For example "+2", "-10" etc.,
 var progress string
+var updateStatus string
 
 // func handleUpdate(mediaId int) {
 // 	CheckIfTokenExists()
@@ -53,7 +54,7 @@ func handleUpdate(cmd *cobra.Command, args []string) {
 			IsNewAddition: false,
 			MediaId:       id,
 			Progress:      progress,
-			Status:        "none",
+			Status:        updateStatus,
 			StartDate:     "none",
 		},
 	)
@@ -77,5 +78,8 @@ func init() {
 		"p",
 		"",
 		"The number of episodes/chapter to update",
+	)
+	mediaUpdateCmd.Flags().StringVarP(
+		&updateStatus, "status", "s", "none", "Status of the media. Can be 'watching/w or reading/r', 'planning/p', 'completed/c', 'dropped/d', 'paused/ps'",
 	)
 }
