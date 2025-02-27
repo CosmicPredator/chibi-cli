@@ -22,7 +22,7 @@ var mediaListCmd = &cobra.Command{
 	Use:     "list",
 	Short:   "List your current anime/manga list",
 	Aliases: []string{"ls"},
-	Run: handleLs,
+	Run:     handleLs,
 }
 
 func init() {

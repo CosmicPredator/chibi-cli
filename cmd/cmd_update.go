@@ -51,10 +51,10 @@ func handleUpdate(cmd *cobra.Command, args []string) {
 	err = viewmodel.HandleMediaUpdate(
 		viewmodel.MediaUpdateParams{
 			IsNewAddition: false,
-			MediaId: id,
-			Progress: progress,
-			Status: "none",
-			StartDate: "none",
+			MediaId:       id,
+			Progress:      progress,
+			Status:        "none",
+			StartDate:     "none",
 		},
 	)
 
@@ -67,7 +67,7 @@ var mediaUpdateCmd = &cobra.Command{
 	Use:   "update [id]",
 	Short: "Update a list entry",
 	Args:  cobra.MinimumNArgs(1),
-	Run: handleUpdate,
+	Run:   handleUpdate,
 }
 
 func init() {

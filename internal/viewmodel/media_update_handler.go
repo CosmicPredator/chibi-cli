@@ -16,13 +16,12 @@ import (
 	"github.com/charmbracelet/huh/spinner"
 )
 
-
 type MediaUpdateParams struct {
 	IsNewAddition bool
-	MediaId int
-	Progress string
-	Status string
-	StartDate string
+	MediaId       int
+	Progress      string
+	Status        string
+	StartDate     string
 }
 
 func getCurrentProgress(userId int, mediaId int) (current int, total *int, err error) {
@@ -30,7 +29,7 @@ func getCurrentProgress(userId int, mediaId int) (current int, total *int, err e
 	err = spinner.New().Title("Getting your list...").Action(func() {
 		mediaList, err = api.GetMediaList(
 			userId,
-			[]string{ "CURRENT", "REPEATING" },
+			[]string{"CURRENT", "REPEATING"},
 		)
 	}).Run()
 
@@ -63,7 +62,7 @@ func getCurrentProgress(userId int, mediaId int) (current int, total *int, err e
 
 func handleNewAddition(params MediaUpdateParams) error {
 	payload := map[string]any{
-		"id": params.MediaId,
+		"id":     params.MediaId,
 		"status": internal.MediaStatusEnumMapper(params.Status),
 	}
 
@@ -100,7 +99,7 @@ func handleNewAddition(params MediaUpdateParams) error {
 	fmt.Println(
 		ui.SuccessText(
 			fmt.Sprintf(
-				"Added %s to %s", 
+				"Added %s to %s",
 				response.Data.SaveMediaListEntry.Media.Title.UserPreferred,
 				statusString,
 			),
@@ -172,10 +171,10 @@ func handleMediaCompletedAction(params MediaUpdateParams, progress int) error {
 	}
 
 	fmt.Println(
-	ui.SuccessText(
-		fmt.Sprintf(
-			"Marked %s as completed",
-			response.Data.SaveMediaListEntry.Media.Title.UserPreferred),
+		ui.SuccessText(
+			fmt.Sprintf(
+				"Marked %s as completed",
+				response.Data.SaveMediaListEntry.Media.Title.UserPreferred),
 		),
 	)
 
@@ -212,7 +211,7 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 		if *total != 0 && accumulatedProgress > *total {
 			return fmt.Errorf("entered value is greater than total episodes / chapters, which is %d", *total)
 		}
-		
+
 		if accumulatedProgress == *total {
 			var markAsCompleted string
 			fmt.Print("Mark as media completed (y/N)? ")
@@ -229,7 +228,7 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 	var response *responses.MediaUpdateResponse
 	err = ui.ActionSpinner("Updating entry...", func(ctx context.Context) error {
 		response, err = api.UpdateMediaEntry(map[string]any{
-			"id": params.MediaId,
+			"id":       params.MediaId,
 			"progress": accumulatedProgress,
 		})
 		return err
@@ -238,8 +237,8 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 	fmt.Println(
 		ui.SuccessText(
 			fmt.Sprintf(
-				"Progress updated for %s (%d -> %d)\n", 
-				response.Data.SaveMediaListEntry.Media.Title.UserPreferred, 
+				"Progress updated for %s (%d -> %d)\n",
+				response.Data.SaveMediaListEntry.Media.Title.UserPreferred,
 				current, accumulatedProgress),
 		),
 	)

@@ -24,8 +24,8 @@ func handleMediaAdd(cmd *cobra.Command, args []string) {
 	err = viewmodel.HandleMediaUpdate(
 		viewmodel.MediaUpdateParams{
 			IsNewAddition: true,
-			MediaId: mediaId,
-			Status: mediaAddStatus,
+			MediaId:       mediaId,
+			Status:        mediaAddStatus,
 		},
 	)
 	if err != nil {

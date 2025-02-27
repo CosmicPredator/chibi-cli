@@ -53,7 +53,7 @@ func (p *ProfileUI) Render() error {
 	valueStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#8BE9FD"))
 
 	var sb strings.Builder
-	
+
 	// iterating over dataSlice and adding the KV pairs to String Builder
 	// with appropriate padding
 	for _, kv := range dataSlice {
