@@ -22,6 +22,7 @@ type MediaUpdateParams struct {
 	Progress      string
 	Status        string
 	StartDate     string
+	Notes         string
 }
 
 func getCurrentProgress(userId int, mediaId int) (current int, total *int, err error) {
@@ -240,12 +241,18 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 		}
 	}
 
+	var notes string
+	if len(params.Notes) > 0 {
+		notes = strings.ReplaceAll(params.Notes, `\n`, "\n")
+	}
+
 	var response *responses.MediaUpdateResponse
 	err = ui.ActionSpinner("Updating entry...", func(ctx context.Context) error {
 		response, err = api.UpdateMediaEntry(map[string]any{
 			"id":       params.MediaId,
 			"progress": accumulatedProgress,
 			"status":   status,
+			"notes":    notes,
 		})
 		return err
 	})

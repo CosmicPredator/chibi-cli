@@ -12,6 +12,7 @@ import (
 // // TODO: Update progress relatively. For example "+2", "-10" etc.,
 var progress string
 var updateStatus string
+var notes string
 
 // func handleUpdate(mediaId int) {
 // 	CheckIfTokenExists()
@@ -56,6 +57,7 @@ func handleUpdate(cmd *cobra.Command, args []string) {
 			Progress:      progress,
 			Status:        updateStatus,
 			StartDate:     "none",
+			Notes:         notes,
 		},
 	)
 
@@ -81,5 +83,12 @@ func init() {
 	)
 	mediaUpdateCmd.Flags().StringVarP(
 		&updateStatus, "status", "s", "none", "Status of the media. Can be 'watching/w or reading/r', 'planning/p', 'completed/c', 'dropped/d', 'paused/ps'",
+	)
+	mediaUpdateCmd.Flags().StringVarP(
+		&notes,
+		"notes",
+		"n",
+		"",
+		"Text notes. Note: you can add multiple lines by typing \"\\n\" and wrapping the note in double quotes",
 	)
 }
