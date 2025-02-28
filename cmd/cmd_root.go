@@ -30,6 +30,7 @@ func Execute(version string) {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.AddCommand(
 		loginCmd,
+		logoutCmd,
 		profileCmd,
 		mediaSearchCmd,
 		mediaListCmd,
