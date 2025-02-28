@@ -73,7 +73,7 @@ func handleNewAddition(params MediaUpdateParams) error {
 			return err
 		}
 
-		if params.Status == "CURRENT" {
+		if payload["status"] == "CURRENT" {
 			payload["sDate"] = startDateRaw.Day()
 			payload["sMonth"] = int(startDateRaw.Month())
 			payload["sYear"] = startDateRaw.Year()
@@ -81,7 +81,7 @@ func handleNewAddition(params MediaUpdateParams) error {
 	} else {
 		startDate := time.Now()
 
-		if params.Status == "CURRENT" {
+		if payload["status"] == "CURRENT" {
 			payload["sDate"] = startDate.Day()
 			payload["sMonth"] = int(startDate.Month())
 			payload["sYear"] = startDate.Year()
