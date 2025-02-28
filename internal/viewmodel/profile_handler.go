@@ -8,6 +8,8 @@ import (
 	"github.com/CosmicPredator/chibi/internal/ui"
 )
 
+// get's user profile information form API and 
+// displays it
 func HandleProfile() error {
 	var profile *responses.Profile
 	var err error

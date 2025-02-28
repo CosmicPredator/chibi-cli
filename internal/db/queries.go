@@ -1,3 +1,5 @@
+// This package consists of all SqLite DB Query string used by chibi
+
 package db
 
 const(

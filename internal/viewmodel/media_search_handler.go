@@ -9,12 +9,14 @@ import (
 	"github.com/CosmicPredator/chibi/internal/ui"
 )
 
+// handler func to handle "chibi search" command
 func HandleMediaSearch(searchQuery string, mediaType string, perPage int) error {
 	mediaType = internal.MediaTypeEnumMapper(mediaType)
 
 	var err error
 	var searchResult *responses.MediaSearch
 
+	// perform search API request
 	err = ui.ActionSpinner("Searching...", func(ctx context.Context) error {
 		searchResult, err = api.SearchMedia(searchQuery, perPage, mediaType)
 		return err
@@ -23,6 +25,7 @@ func HandleMediaSearch(searchQuery string, mediaType string, perPage int) error 
 		return err
 	}
 
+	// display the result
 	mediaSearchUI := ui.MediaSearchUI{
 		MediaList: &searchResult.Data.Page.Media,
 	}

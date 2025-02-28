@@ -17,6 +17,7 @@ type MediaListUI struct {
 	MediaList *responses.MediaList
 }
 
+// table renderer for media list
 func (l *MediaListUI) renderTable(rows ...[]string) (*table.Table, error) {
 	// get size of terminal
 	tw, _, err := term.GetSize((os.Stdout.Fd()))
