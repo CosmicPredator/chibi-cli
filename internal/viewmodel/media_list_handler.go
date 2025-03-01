@@ -11,6 +11,7 @@ import (
 	"github.com/CosmicPredator/chibi/internal/ui"
 )
 
+// handler func for "chibi ls" command
 func HandleMediaList(mediaType, mediaStatus string) error {
 	mediaType = internal.MediaTypeEnumMapper(mediaType)
 	mediaStatus = internal.MediaStatusEnumMapper(mediaStatus)
@@ -30,6 +31,8 @@ func HandleMediaList(mediaType, mediaStatus string) error {
 		return err
 	}
 
+	// if status arg is "watching", the include both
+	// current and repeating
 	var mediaStatuIn []string
 	if mediaStatus == "CURRENT" {
 		mediaStatuIn = []string{mediaStatus, "REPEATING"}
@@ -37,6 +40,7 @@ func HandleMediaList(mediaType, mediaStatus string) error {
 		mediaStatuIn = []string{mediaStatus}
 	}
 
+	// perform media list API request
 	var mediaList *responses.MediaList
 	err = ui.ActionSpinner("Fetching lists...", func(ctx context.Context) error {
 		mediaList, err = api.GetMediaList(
@@ -48,6 +52,7 @@ func HandleMediaList(mediaType, mediaStatus string) error {
 		return err
 	}
 
+	// display the result
 	mediaListUI := ui.MediaListUI{
 		MediaType: mediaType,
 		MediaList: mediaList,

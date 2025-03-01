@@ -16,6 +16,7 @@ type MediaSearchUI struct {
 	MediaList *[]responses.MediaSearchList
 }
 
+// table renderer for media search results
 func (ms *MediaSearchUI) renderTable(rows ...[]string) (*table.Table, error) {
 	tw, _, err := term.GetSize((os.Stdout.Fd()))
 	if err != nil {
@@ -67,6 +68,7 @@ func (ms *MediaSearchUI) renderTable(rows ...[]string) (*table.Table, error) {
 	return table, nil
 }
 
+// render UI string
 func (ms *MediaSearchUI) Render() error {
 	rows := [][]string{}
 

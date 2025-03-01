@@ -26,8 +26,12 @@ type MediaUpdateParams struct {
 	Score         float32
 }
 
+// Gets current and total progress (episode/chapter) for given
+// Media ID and returns it
 func getCurrentProgress(userId int, mediaId int) (current int, total *int, err error) {
 	var mediaList *responses.MediaList
+
+	// load medialist collection
 	err = spinner.New().Title("Getting your list...").Action(func() {
 		mediaList, err = api.GetMediaList(
 			userId,
@@ -39,6 +43,7 @@ func getCurrentProgress(userId int, mediaId int) (current int, total *int, err e
 		return
 	}
 
+	// iterate over anime list collection and see if media ID matches
 	for _, list := range mediaList.Data.AnimeListCollection.Lists {
 		for _, entry := range list.Entries {
 			if entry.Media.Id == mediaId {
@@ -49,6 +54,7 @@ func getCurrentProgress(userId int, mediaId int) (current int, total *int, err e
 		}
 	}
 
+	// iterate over manga list and see if media ID matches
 	for _, list := range mediaList.Data.MangaListCollection.Lists {
 		for _, entry := range list.Entries {
 			if entry.Media.Id == mediaId {
@@ -59,15 +65,19 @@ func getCurrentProgress(userId int, mediaId int) (current int, total *int, err e
 		}
 	}
 
+	// if media id not in list, return default values
 	return
 }
 
-func handleNewAddition(params MediaUpdateParams) error {
+// this func gets incvoked when "chibi add" command is invoked
+func handleNewAdditionAction(params MediaUpdateParams) error {
 	payload := map[string]any{
 		"id":     params.MediaId,
 		"status": internal.MediaStatusEnumMapper(params.Status),
 	}
 
+	// if passed status is watching and start date is empty,
+	// fill the startData field with current date (today)
 	if params.StartDate != "" {
 		startDateRaw, err := time.Parse("02/01/2006", params.StartDate)
 		if err != nil {
@@ -89,6 +99,7 @@ func handleNewAddition(params MediaUpdateParams) error {
 		}
 	}
 
+	// perform API mutate request
 	var response *responses.MediaUpdateResponse
 	var err error
 	err = ui.ActionSpinner("Adding entry...", func(ctx context.Context) error {
@@ -99,6 +110,7 @@ func handleNewAddition(params MediaUpdateParams) error {
 		return err
 	}
 
+	// humanize strings for clear output
 	var statusString string
 	if internal.MediaStatusEnumMapper(params.Status) == "CURRENT" {
 		statusString = "watching"
@@ -119,11 +131,17 @@ func handleNewAddition(params MediaUpdateParams) error {
 	return nil
 }
 
+// this func gets invoked when the current progress
+// matches the total progress
 func handleMediaCompletedAction(params MediaUpdateParams, progress int) error {
 	currDate := fmt.Sprintf("%d/%02d/%d\n", time.Now().Day(), time.Now().Month(), time.Now().Year())
 	var scoreString string
 	var notes string
 
+	// display a series of huh! forms
+	// 1. Completed Data
+	// 2. Notes
+	// 3. Score
 	huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
@@ -154,6 +172,8 @@ func handleMediaCompletedAction(params MediaUpdateParams, progress int) error {
 				Value(&scoreString),
 		),
 	).Run()
+
+	// parse form strings to API required data type
 	completedDate, err := time.Parse("02/01/2006", strings.TrimSpace(currDate))
 	if err != nil {
 		return err
@@ -163,6 +183,7 @@ func handleMediaCompletedAction(params MediaUpdateParams, progress int) error {
 		return err
 	}
 
+	// perform API mutation request
 	var response *responses.MediaUpdateResponse
 	err = ui.ActionSpinner("Marking as completed...", func(ctx context.Context) error {
 		response, err = api.UpdateMediaEntry(map[string]any{
@@ -180,6 +201,7 @@ func handleMediaCompletedAction(params MediaUpdateParams, progress int) error {
 		return err
 	}
 
+	// display success text
 	fmt.Println(
 		ui.SuccessText(
 			fmt.Sprintf(
@@ -191,9 +213,15 @@ func handleMediaCompletedAction(params MediaUpdateParams, progress int) error {
 	return nil
 }
 
+// handles media update logic and functionalities
+// This func has 3 scenarios/routes
+// 1. Invoke handleNewAdditionAction() when MediaUpdateParams.IsNewAddition is true
+// 2. Invoke handleMediaCompletedAction() when current/accumulated progress == total progress
+// 3. else go on with the flow (just progress update)
 func HandleMediaUpdate(params MediaUpdateParams) error {
+	// route 1
 	if params.IsNewAddition {
-		handleNewAddition(params)
+		handleNewAdditionAction(params)
 		return nil
 	}
 
@@ -212,6 +240,7 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 		return err
 	}
 
+	// parses relative progress (+2, -4) to current + relative progress
 	accumulatedProgress, err := parseRelativeProgress(params.Progress, current)
 	if err != nil {
 		return err
@@ -237,6 +266,7 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 			return fmt.Errorf("entered value is greater than total episodes / chapters, which is %d", *total)
 		}
 
+		// route 2
 		if accumulatedProgress == *total {
 			var markAsCompleted string
 			fmt.Print("Mark as media completed (y/N)? ")
@@ -255,6 +285,7 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 		notes = strings.ReplaceAll(params.Notes, `\n`, "\n")
 	}
 
+	// route 3
 	var response *responses.MediaUpdateResponse
 	err = ui.ActionSpinner("Updating entry...", func(ctx context.Context) error {
 		payload := map[string]any{
@@ -282,6 +313,7 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 	return nil
 }
 
+// helper func to create absolute progress from relative progress
 func parseRelativeProgress(progress string, current int) (int, error) {
 	var accumulatedProgress int
 	if len(progress) == 0 {
