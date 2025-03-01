@@ -17,7 +17,7 @@ func CreateConfigDir() {
 		os.RemoveAll(configDir)
 	}
 	os.MkdirAll(configDir, 0755)
-} 
+}
 
 // maps "type" command line argument string to valid
 // MediaType enum required by AniList API

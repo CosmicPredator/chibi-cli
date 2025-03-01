@@ -6,8 +6,8 @@ type MediaSearchList struct {
 		UserPreferred string `json:"userPreferred"`
 	} `json:"title"`
 	AverageScore *float64 `json:"averageScore"`
-	MediaType    string  `json:"type"`
-	MediaFormat  string  `json:"format"`
+	MediaType    string   `json:"type"`
+	MediaFormat  string   `json:"format"`
 }
 
 type MediaSearch struct {

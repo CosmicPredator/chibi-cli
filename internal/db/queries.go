@@ -2,7 +2,7 @@
 
 package db
 
-const(
+const (
 	QUERY_CREATE_TABLE = `CREATE TABLE IF NOT EXISTS config (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		key TEXT NOT NULL,

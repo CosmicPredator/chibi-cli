@@ -86,7 +86,7 @@ var mediaSearchCmd = &cobra.Command{
 	Use:   "search [query...]",
 	Short: "Search for anime and manga",
 	Args:  cobra.MinimumNArgs(1),
-	Run: handleMediaSearch,
+	Run:   handleMediaSearch,
 }
 
 func init() {

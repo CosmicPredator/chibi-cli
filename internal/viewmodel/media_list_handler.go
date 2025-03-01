@@ -35,9 +35,9 @@ func HandleMediaList(mediaType, mediaStatus string) error {
 	// current and repeating
 	var mediaStatuIn []string
 	if mediaStatus == "CURRENT" {
-		mediaStatuIn = []string{ mediaStatus, "REPEATING" }
+		mediaStatuIn = []string{mediaStatus, "REPEATING"}
 	} else {
-		mediaStatuIn = []string{ mediaStatus }
+		mediaStatuIn = []string{mediaStatus}
 	}
 
 	// perform media list API request
@@ -57,7 +57,7 @@ func HandleMediaList(mediaType, mediaStatus string) error {
 		MediaType: mediaType,
 		MediaList: mediaList,
 	}
-	
+
 	err = mediaListUI.Render()
 	return err
 }

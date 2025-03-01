@@ -34,7 +34,7 @@ func HandleLogin() error {
 		return err
 	}
 
-	// gets user profile details from api and saves 
+	// gets user profile details from api and saves
 	// the username and ID to db
 	var profile *responses.Profile
 	err = ui.ActionSpinner("Logging In...", func(ctx context.Context) error {

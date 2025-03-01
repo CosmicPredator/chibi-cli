@@ -32,13 +32,13 @@ func (ms *MediaSearchUI) renderTable(rows ...[]string) (*table.Table, error) {
 			// style for table header row
 			if row == -1 {
 				return lipgloss.
-				NewStyle().
-				Foreground(lipgloss.Color("#FF79C6")).
-				Bold(true).
-				Align(lipgloss.Center)
+					NewStyle().
+					Foreground(lipgloss.Color("#FF79C6")).
+					Bold(true).
+					Align(lipgloss.Center)
 			}
 
-			if row % 2 == 0 && (col == 0 || col == 2 || col == 3) {
+			if row%2 == 0 && (col == 0 || col == 2 || col == 3) {
 				return lipgloss.NewStyle().Align(lipgloss.Center).Faint(true)
 			}
 
@@ -50,7 +50,7 @@ func (ms *MediaSearchUI) renderTable(rows ...[]string) (*table.Table, error) {
 					PaddingLeft(2).
 					PaddingRight(2).
 					Width((tw - 6) / 3).Inline(true)
-				if row % 2 == 0 {
+				if row%2 == 0 {
 					colStyle = colStyle.Faint(true)
 				}
 				return colStyle
@@ -64,7 +64,7 @@ func (ms *MediaSearchUI) renderTable(rows ...[]string) (*table.Table, error) {
 		}).
 		Headers("ID", "TITLE", "FORMAT", "SCORE").
 		Rows(rows...).Width(tw)
-	
+
 	return table, nil
 }
 

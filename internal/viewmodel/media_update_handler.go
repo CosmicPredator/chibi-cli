@@ -16,25 +16,26 @@ import (
 	"github.com/charmbracelet/huh/spinner"
 )
 
-
 type MediaUpdateParams struct {
 	IsNewAddition bool
-	MediaId int
-	Progress string
-	Status string
-	StartDate string
+	MediaId       int
+	Progress      string
+	Status        string
+	StartDate     string
+	Notes         string
+	Score         float32
 }
 
 // Gets current and total progress (episode/chapter) for given
 // Media ID and returns it
 func getCurrentProgress(userId int, mediaId int) (current int, total *int, err error) {
 	var mediaList *responses.MediaList
-	
+
 	// load medialist collection
 	err = spinner.New().Title("Getting your list...").Action(func() {
 		mediaList, err = api.GetMediaList(
 			userId,
-			[]string{ "CURRENT", "REPEATING" },
+			[]string{"CURRENT", "REPEATING"},
 		)
 	}).Run()
 
@@ -71,7 +72,7 @@ func getCurrentProgress(userId int, mediaId int) (current int, total *int, err e
 // this func gets incvoked when "chibi add" command is invoked
 func handleNewAdditionAction(params MediaUpdateParams) error {
 	payload := map[string]any{
-		"id": params.MediaId,
+		"id":     params.MediaId,
 		"status": internal.MediaStatusEnumMapper(params.Status),
 	}
 
@@ -83,10 +84,18 @@ func handleNewAdditionAction(params MediaUpdateParams) error {
 			return err
 		}
 
-		if params.Status == "CURRENT" {
+		if payload["status"] == "CURRENT" {
 			payload["sDate"] = startDateRaw.Day()
 			payload["sMonth"] = int(startDateRaw.Month())
 			payload["sYear"] = startDateRaw.Year()
+		}
+	} else {
+		startDate := time.Now()
+
+		if payload["status"] == "CURRENT" {
+			payload["sDate"] = startDate.Day()
+			payload["sMonth"] = int(startDate.Month())
+			payload["sYear"] = startDate.Year()
 		}
 	}
 
@@ -112,7 +121,7 @@ func handleNewAdditionAction(params MediaUpdateParams) error {
 	fmt.Println(
 		ui.SuccessText(
 			fmt.Sprintf(
-				"Added %s to %s", 
+				"Added %s to %s",
 				response.Data.SaveMediaListEntry.Media.Title.UserPreferred,
 				statusString,
 			),
@@ -194,19 +203,18 @@ func handleMediaCompletedAction(params MediaUpdateParams, progress int) error {
 
 	// display success text
 	fmt.Println(
-	ui.SuccessText(
-		fmt.Sprintf(
-			"Marked %s as completed",
-			response.Data.SaveMediaListEntry.Media.Title.UserPreferred),
+		ui.SuccessText(
+			fmt.Sprintf(
+				"Marked %s as completed",
+				response.Data.SaveMediaListEntry.Media.Title.UserPreferred),
 		),
 	)
 
 	return nil
 }
 
-
 // handles media update logic and functionalities
-// This func has 3 scenarios/routes 
+// This func has 3 scenarios/routes
 // 1. Invoke handleNewAdditionAction() when MediaUpdateParams.IsNewAddition is true
 // 2. Invoke handleMediaCompletedAction() when current/accumulated progress == total progress
 // 3. else go on with the flow (just progress update)
@@ -238,11 +246,26 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 		return err
 	}
 
+	status := internal.MediaStatusEnumMapper(params.Status)
+	if status == "COMPLETED" {
+		if *total != 0 && accumulatedProgress < *total {
+			var markAsCompleted string
+			fmt.Print("Accumulated progress is less than total episodes / chapters. Mark as media completed (y/N)? ")
+			fmt.Scan(&markAsCompleted)
+
+			if strings.ToLower(markAsCompleted) != "y" {
+				return nil
+			}
+		}
+		err = handleMediaCompletedAction(params, accumulatedProgress)
+		return err
+	}
+
 	if total != nil {
 		if *total != 0 && accumulatedProgress > *total {
 			return fmt.Errorf("entered value is greater than total episodes / chapters, which is %d", *total)
 		}
-		
+
 		// route 2
 		if accumulatedProgress == *total {
 			var markAsCompleted string
@@ -257,21 +280,32 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 		}
 	}
 
+	var notes string
+	if len(params.Notes) > 0 {
+		notes = strings.ReplaceAll(params.Notes, `\n`, "\n")
+	}
+
 	// route 3
 	var response *responses.MediaUpdateResponse
 	err = ui.ActionSpinner("Updating entry...", func(ctx context.Context) error {
-		response, err = api.UpdateMediaEntry(map[string]any{
-			"id": params.MediaId,
+		payload := map[string]any{
+			"id":       params.MediaId,
 			"progress": accumulatedProgress,
-		})
+			"status":   status,
+			"notes":    notes,
+		}
+		if params.Score > 0 {
+			payload["score"] = params.Score
+		}
+		response, err = api.UpdateMediaEntry(payload)
 		return err
 	})
 
 	fmt.Println(
 		ui.SuccessText(
 			fmt.Sprintf(
-				"Progress updated for %s (%d -> %d)\n", 
-				response.Data.SaveMediaListEntry.Media.Title.UserPreferred, 
+				"Progress updated for %s (%d -> %d)\n",
+				response.Data.SaveMediaListEntry.Media.Title.UserPreferred,
 				current, accumulatedProgress),
 		),
 	)
@@ -282,6 +316,9 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 // helper func to create absolute progress from relative progress
 func parseRelativeProgress(progress string, current int) (int, error) {
 	var accumulatedProgress int
+	if len(progress) == 0 {
+		return current, nil
+	}
 	if strings.Contains(progress, "+") || strings.Contains(progress, "-") {
 		if progress[:1] == "+" {
 			prgInt, _ := strconv.Atoi(progress[1:])
