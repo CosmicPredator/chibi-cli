@@ -2,13 +2,13 @@ name: Release (Multiple Arch)
 
 on:
   push:
-    branches: [ prod ]
-  pull_request: 
-    branches: [ prod ]
+    tags:
+      - "*"
   workflow_dispatch:
 
 jobs:
   build_release:
+    name: Run Make Build
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
@@ -16,6 +16,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Cache Go Modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: go-mod-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            go-mod-${{ runner.os }}-
 
       - name: Run Make
         run: make BUILD_TYPE=RELEASE
@@ -32,12 +42,21 @@ jobs:
   build_win_installer:
     needs: build_release
     runs-on: windows-latest
+    name: Build Windows Installer (INNO)
     permissions: write-all
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      
+      - name: Read Version
+        id: read_version
+        shell: pwsh
+        run: |
+          $TAG = git describe --tags --abbrev=0
+          echo "Current tag: $TAG"
+          echo "V_TAG=$TAG" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       
       - name: Download Artifact
         uses: actions/download-artifact@v4
@@ -48,17 +67,23 @@ jobs:
       
       - name: Rename Binary
         shell: cmd
-        run: ren build\chibi_windows.exe chibi.exe
+        run: ren build\chibi_${{ env.V_TAG }}_win_amd64.exe chibi.exe
       
       - name: Pack Installer
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.5
+        env:
+          V_TAG: ${{ env.V_TAG }}
         with:
           path: installer_scripts\chibi_setup.iss
           options: /O+
       
       - name: Move installer to build dir
         shell: cmd
-        run: move installer_scripts\Output\chibi_installer.exe build\
+        run: move installer_scripts\Output\chibi_${{ env.V_TAG }}_installer.exe build\
+      
+      - name: Rename Binary (Again)
+        shell: cmd
+        run: ren build\chibi.exe chibi_${{ env.V_TAG }}_win_amd64.exe
       
       - name: Upload Installer Artifacts
         uses: actions/upload-artifact@v4
@@ -67,6 +92,7 @@ jobs:
           path: build
   
   create_release:
+    name: Publish new Release
     needs: build_win_installer
     permissions: write-all
     runs-on: ubuntu-latest
@@ -112,3 +138,80 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ env.tag }}
           files: "build/*"
+
+  publish_to_winget:
+    needs: create_release
+    permissions: write-all
+    runs-on: windows-latest
+    name: Publish installer to WinGet
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Publish to WinGet
+        uses: vedantmgoyal9/winget-releaser@main
+        with:
+          identifier: CosmicPredator.Chibi
+          installers-regex: '.*_installer\.exe$'
+          token: ${{ secrets.WINGET_TOKEN }} 
+
+  publish_to_snap_store:
+    needs: create_release
+    runs-on: ubuntu-latest
+    name: Publish to Snap Store
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Read Tag
+        id: read_version
+        run: |
+          TAG=$(git describe --tags --abbrev=0)
+          echo "Current tag: $TAG"
+          echo "tag=$TAG" >> $GITHUB_ENV
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build_artifacts_with_installer
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/
+      
+      - name: Rename Linux Binary
+        run: |
+          mv build/chibi_${{ env.tag }}_linux_amd64 build/chibi
+          sudo chmod 777 build/chibi
+          echo "Rename binary successful"
+      
+      - name: Move snapcraft.yaml file to root
+        run: |
+          mv installer_scripts/snapcraft.yaml snapcraft.yaml
+          echo "version: ${{ env.tag }}" >> snapcraft.yaml 
+
+      - name: Install Snapcraft
+        run: |
+          sudo snap install snapcraft --classic
+
+      - name: Setup LXD
+        uses: canonical/setup-lxd@main
+        with:
+          group: lxd
+      
+      - name: Build snap
+        run: |
+          sudo usermod -a -G lxd $USER
+          sudo snapcraft
+
+      - name: Upload snap to Snap Store
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
+        run: |
+          sudo snap install snapcraft --classic
+          snapcraft upload *.snap --release=candidate
+          
+
+      

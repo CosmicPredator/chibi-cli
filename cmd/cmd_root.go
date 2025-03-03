@@ -14,7 +14,7 @@ var rootCmd = &cobra.Command{
 	Long: "Chibi for AniList - A lightweight anime & manga tracker CLI app powered by AniList.",
 	Run: func(cmd *cobra.Command, args []string) {
 		if isVersionCmd {
-			fmt.Println(SUCCESS_MESSAGE_TEMPLATE.Render(appVersion))
+			fmt.Printf("chibi version %s\n", appVersion)
 		} else {
 			cmd.Help()
 		}
@@ -22,7 +22,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.Flags().BoolVarP(&isVersionCmd, "version", "v", false, "Prints the version of the app")
+	rootCmd.Flags().BoolVarP(&isVersionCmd, "version", "v", false, "prints the version of chibi")
 }
 
 func Execute(version string) {
@@ -30,6 +30,7 @@ func Execute(version string) {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.AddCommand(
 		loginCmd,
+		logoutCmd,
 		profileCmd,
 		mediaSearchCmd,
 		mediaListCmd,

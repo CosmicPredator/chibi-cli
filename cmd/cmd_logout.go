@@ -8,15 +8,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func handleLoginCmd(cmd *cobra.Command, args []string) {
-	err := viewmodel.HandleLogin()
+func handleLogoutCommand(cmd *cobra.Command, args []string) {
+	err := viewmodel.HandleLogout()
 	if err != nil {
 		fmt.Println(ui.ErrorText(err))
 	}
 }
 
-var loginCmd = &cobra.Command{
-	Use:   "login",
-	Short: "Login with anilist",
-	Run:   handleLoginCmd,
+var logoutCmd = &cobra.Command{
+	Use: "logout",
+	Short: "logs you out from anilist",
+	Run: handleLogoutCommand,
 }

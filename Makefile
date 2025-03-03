@@ -13,10 +13,11 @@ else
 	LDFLAGS:="-X 'main.VERSION=${LATEST_TAG}'"
 endif
 
-LINUX_BIN=${BINARY_NAME}_linux_amd64
-WIN_BIN=${BINARY_NAME}_windows.exe
-APPLE_INTEL_BIN=${BINARY_NAME}_darwin_amd64
-APPLE_SILICON_BIN=${BINARY_NAME}_darwin_arm64
+LINUX_BIN=${BINARY_NAME}_${LATEST_TAG}_linux_amd64
+WIN_BIN=${BINARY_NAME}_${LATEST_TAG}_win_amd64.exe
+WIN_ARM_BIN=${BINARY_NAME}_${LATEST_TAG}_win_arm64.exe
+APPLE_INTEL_BIN=${BINARY_NAME}_${LATEST_TAG}_darwin_amd64
+APPLE_SILICON_BIN=${BINARY_NAME}_${LATEST_TAG}_darwin_arm64
 
 .PHONY: all
 
@@ -31,6 +32,7 @@ compile:
 	GOARCH=amd64 GOOS=darwin go build -ldflags=${LDFLAGS} -o ${BUILD_DIR}/${APPLE_INTEL_BIN}
 	GOARCH=arm64 GOOS=darwin go build -ldflags=${LDFLAGS} -o ${BUILD_DIR}/${APPLE_SILICON_BIN}
 	GOARCH=amd64 GOOS=windows go build -ldflags=${LDFLAGS} -o ${BUILD_DIR}/${WIN_BIN}
+	GOARCH=arm64 GOOS=windows go build -ldflags=${LDFLAGS} -o ${BUILD_DIR}/${WIN_ARM_BIN}
 	GOARCH=amd64 GOOS=linux go build -ldflags=${LDFLAGS} -o ${BUILD_DIR}/${LINUX_BIN}
 
 #TODO: Implement dynamic versioning
