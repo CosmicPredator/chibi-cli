@@ -1,0 +1,30 @@
+name: chibi
+base: core24
+summary: A lightweight anime & manga tracker CLI app powered by AniList
+description: |
+  Chibi for AniList - A lightweight anime & manga tracker CLI app powered by AniList.
+  Features,
+  1. Easily manage your anime and manga lists without even opening your browser.
+  2. Lightweight and easy on your keyboard.
+  3. Colorful and structured outputs.
+  4. Supports most terminals and shells.
+  5. Changes are synced directly with AniList. No local saving BS.
+  6. Faster by design.
+adopt-info: my-part
+
+grade: stable
+confinement: strict
+
+parts:
+  my-part:
+    plugin: dump
+    source: .
+    source-type: local
+    organize:
+      "build/chibi": "usr/local/bin/chibi"
+
+apps:
+  chibi:
+    command: usr/local/bin/chibi
+    plugs:
+      - network
