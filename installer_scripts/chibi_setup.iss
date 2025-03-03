@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Chibi"
-#define MyAppVersion "1.0.1"
+#define MyAppVersion GetEnv("V_TAG")
 #define MyAppPublisher "Cosmic Predator"
 #define MyAppURL "https://chibi-cli.pages.dev/"
 #define MyAppExeName "chibi.exe"
@@ -12,7 +12,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{376146BA-D0F2-4F07-A294-C309EB07121A}
 AppName={#MyAppName}
-;AppVersion={#MyAppVersion}
+AppVersion={#MyAppVersion}
 AppVerName={#MyAppName}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
@@ -32,7 +32,7 @@ DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 PrivilegesRequired=lowest
-OutputBaseFilename=chibi_installer
+OutputBaseFilename=chibi_{#MyAppVersion}_installer
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
