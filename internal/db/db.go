@@ -41,7 +41,7 @@ func (dc *DbContext) init(isFirstTime bool) error {
 	if isFirstTime {
 		internal.CreateConfigDir()
 	}
-	dbPath := path.Join(configDir, "chibi_config.db")
+	dbPath := path.Join(configDir, internal.DB_NAME)
 
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
