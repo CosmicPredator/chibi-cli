@@ -10,11 +10,12 @@ import (
 	"io"
 	"net/http"
 	"os"
+
+	"github.com/CosmicPredator/chibi/internal"
 )
 
 func convertToPNG(jpgData []byte) ([]byte, error) {
 	img, _, err := image.Decode(bytes.NewReader(jpgData))
-	//resized := resize.Resize(220, 300, img, resize.Lanczos3)
 
 	if err != nil {
 		return nil, err
@@ -85,6 +86,7 @@ type KGPParams struct {
 }
 
 func RenderWithImage(imageUrl string, content string, kgpParams KGPParams, numLines int) error {
+
 	resp, err := http.Get(imageUrl)
 	if err != nil {
 		panic(err)
@@ -112,10 +114,11 @@ func RenderWithImage(imageUrl string, content string, kgpParams KGPParams, numLi
 
 	fmt.Print("\n")
 	fmt.Println(content)
-	fmt.Printf("\033[%dA\033[2C", numLines)
-
-	writeChunked(cmd, pngData)
-	fmt.Print("\n")
+	if internal.CanSupportKittyGP() {
+		fmt.Printf("\033[%dA\033[2C", numLines)
+		writeChunked(cmd, pngData)
+		fmt.Print("\n")
+	}
 
 	return nil
 }
