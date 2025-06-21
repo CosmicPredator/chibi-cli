@@ -8,7 +8,7 @@ import (
 	"github.com/CosmicPredator/chibi/internal/ui"
 )
 
-// get's user profile information form API and 
+// get's user profile information form API and
 // displays it
 func HandleProfile() error {
 	var profile *responses.Profile
@@ -32,6 +32,7 @@ func HandleProfile() error {
 		MinutesWatched: profile.Data.Viewer.Statistics.Anime.MinutesWatched,
 		ChaptersRead:   profile.Data.Viewer.Statistics.Manga.ChaptersRead,
 		SiteUrl:        profile.Data.Viewer.SiteUrl,
+		AvatarUrl:      profile.Data.Viewer.Avatar.Large,
 	}
 
 	// display profile UI

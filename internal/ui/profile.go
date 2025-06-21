@@ -15,6 +15,7 @@ type ProfileUI struct {
 	TotalManga     int
 	MinutesWatched int
 	ChaptersRead   int
+	AvatarUrl      string
 	SiteUrl        string
 }
 
@@ -59,7 +60,8 @@ func (p *ProfileUI) Render() error {
 	for _, kv := range dataSlice {
 		sb.WriteString(
 			fmt.Sprintf(
-				"%s : %s\n",
+				"%*s%s : %s\n",
+				20, "",
 				keyStyle.MarginRight(maxKeyLen-len(kv.Key)).Render(kv.Key),
 				valueStyle.Render(kv.Value),
 			),
@@ -67,6 +69,12 @@ func (p *ProfileUI) Render() error {
 	}
 
 	// Display the output
-	fmt.Print(sb.String())
+	RenderWithImage(
+		p.AvatarUrl, 
+		sb.String(), 
+		KGPParams{
+			R: "7",
+			C: "15",
+		},8)
 	return nil
 }
