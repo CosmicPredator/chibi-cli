@@ -8,7 +8,7 @@ import (
 	"github.com/CosmicPredator/chibi/internal"
 	"github.com/CosmicPredator/chibi/internal/api"
 	"github.com/CosmicPredator/chibi/internal/api/responses"
-	"github.com/CosmicPredator/chibi/internal/db"
+	"github.com/CosmicPredator/chibi/internal/credstore"
 	"github.com/CosmicPredator/chibi/internal/ui"
 )
 
@@ -22,14 +22,8 @@ func HandleLogin() error {
 		return err
 	}
 
-	dbConn, err := db.NewDbConn(true)
-	if err != nil {
-		return err
-	}
-	defer dbConn.Close()
-
 	// write access token to db
-	err = dbConn.SetConfig("auth_token", loginUI.GetAuthToken())
+	err = credstore.SetCredential("auth_token", loginUI.GetAuthToken())
 	if err != nil {
 		return err
 	}
@@ -45,12 +39,12 @@ func HandleLogin() error {
 		return err
 	}
 
-	err = dbConn.SetConfig("user_id", strconv.Itoa(profile.Data.Viewer.Id))
+	err = credstore.SetCredential("user_id", strconv.Itoa(profile.Data.Viewer.Id))
 	if err != nil {
 		return err
 	}
 
-	err = dbConn.SetConfig("user_name", profile.Data.Viewer.Name)
+	err = credstore.SetCredential("user_name", profile.Data.Viewer.Name)
 	if err != nil {
 		return err
 	}

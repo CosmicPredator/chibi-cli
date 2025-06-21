@@ -10,7 +10,7 @@ import (
 
 	"github.com/CosmicPredator/chibi/internal"
 	"github.com/CosmicPredator/chibi/internal/api/responses"
-	"github.com/CosmicPredator/chibi/internal/db"
+	"github.com/CosmicPredator/chibi/internal/credstore"
 )
 
 // Helper function to parse query string and variable map
@@ -32,13 +32,7 @@ func queryAnilist(query string, variables map[string]any) ([]byte, error) {
 		return nil, err
 	}
 
-	dbConn, err := db.NewDbConn(false)
-	if err != nil {
-		return nil, err
-	}
-	defer dbConn.Close()
-
-	token, err := dbConn.GetConfig("auth_token")
+	token, err := credstore.GetCredential("auth_token")
 	if err != nil {
 		return nil, errors.New("not logged in. Please use \"chibi login\" to continue")
 	}

@@ -2,14 +2,12 @@ package ui
 
 import (
 	"fmt"
-	"os"
 	"strconv"
+	"strings"
 
 	"github.com/CosmicPredator/chibi/internal"
 	"github.com/CosmicPredator/chibi/internal/api/responses"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/lipgloss/table"
-	"github.com/charmbracelet/x/term"
 )
 
 type MediaListUI struct {
@@ -17,58 +15,53 @@ type MediaListUI struct {
 	MediaList *responses.MediaList
 }
 
-// table renderer for media list
-func (l *MediaListUI) renderTable(rows ...[]string) (*table.Table, error) {
-	// get size of terminal
-	tw, _, err := term.GetSize((os.Stdout.Fd()))
-	if err != nil {
-		return nil, err
+type MediaListEntry struct {
+	Id string
+	Title string
+	Format string
+	Progress string
+}
+
+func (l *MediaListUI) renderColumn(entries ...*MediaListEntry) string {
+	col := func(w int) lipgloss.Style {
+		return lipgloss.NewStyle().Width(w).MarginRight(2).Align(lipgloss.Right)
 	}
 
-	tw = int(float32(tw) * float32(0.9))
+	styles := []lipgloss.Style{
+		col(7),
+		col(8),
+		col(8),
+		col(0),
+	}
 
-	table := table.New().
-		Border(lipgloss.RoundedBorder()).
-		BorderStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("99"))).
-		StyleFunc(func(row, col int) lipgloss.Style {
-			// style for table header row
-			if row == -1 {
-				return lipgloss.
-					NewStyle().
-					Foreground(lipgloss.Color("#FF79C6")).
-					Bold(true).
-					Align(lipgloss.Center)
-			}
+	headerStyle := func (style lipgloss.Style) lipgloss.Style {
+		return style.MarginBottom(1).Underline(true).Bold(true).Foreground(lipgloss.ANSIColor(5))
+	}
 
-			if row%2 == 0 && (col == 0 || col == 2 || col == 3) {
-				return lipgloss.NewStyle().Align(lipgloss.Center).Faint(true)
-			}
+	var sb strings.Builder
+	header := []string{
+		headerStyle(styles[0]).Render("ID"),
+		headerStyle(styles[1]).Render("FORMAT"),
+		headerStyle(styles[2]).Render("PROGRESS"),
+		headerStyle(styles[3]).Render("TITLE"),
+	}
 
-			// force title column to wrap by specifying terminal width
-			if col == 1 {
-				colStyle := lipgloss.
-					NewStyle().
-					Align(lipgloss.Center).
-					PaddingLeft(1).
-					PaddingRight(1).
-					Width((tw - 6) / 3).Inline(true)
-				if row%2 == 0 {
-					colStyle = colStyle.Faint(true)
-				}
-				return colStyle
-			}
+	sb.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, header...) + "\n")
+	for _, entry := range entries {
+		row := []string{
+			styles[0].Foreground(lipgloss.ANSIColor(6)).Render(entry.Id),
+			styles[1].Foreground(lipgloss.ANSIColor(2)).Render(entry.Format),
+			styles[2].Foreground(lipgloss.ANSIColor(3)).Render(entry.Progress),
+			styles[3].Render(entry.Title),
+		}
+		sb.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, row...) + "\n")
+	}
 
-			return lipgloss.NewStyle().Align(lipgloss.Center).PaddingLeft(2).PaddingRight(2)
-		}).
-		Headers("ID", "TITLE", "FORMAT", "PROGRESS").
-		Rows(rows...).Width(tw)
-
-	return table, nil
+	return sb.String()
 }
 
 func (l *MediaListUI) Render() error {
-	rows := [][]string{}
-
+	var rows []*MediaListEntry = make([]*MediaListEntry, 0)
 	var selectedList responses.ListCollection
 
 	if internal.MediaType(l.MediaType) == internal.ANIME {
@@ -101,24 +94,21 @@ func (l *MediaListUI) Render() error {
 			}
 
 			if list.Status == "REPEATING" {
-				entry.Media.Title.UserPreferred = "(R) " + entry.Media.Title.UserPreferred
+				entry.Media.Title.UserPreferred = lipgloss.
+					NewStyle().
+					Foreground(lipgloss.ANSIColor(4)).
+					Render("(R) ") + entry.Media.Title.UserPreferred
 			}
 
-			rows = append(rows, []string{
-				strconv.Itoa(entry.Media.Id),
-				entry.Media.Title.UserPreferred,
-				internal.MediaFormatFormatter(entry.Media.MediaFormat),
-				progress,
+			rows = append(rows, &MediaListEntry{
+				Id: strconv.Itoa(entry.Media.Id),
+				Title: entry.Media.Title.UserPreferred,
+				Format: internal.MediaFormatFormatter(entry.Media.MediaFormat),
+				Progress: progress,
 			})
 		}
 	}
 
-	table, err := l.renderTable(rows...)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(table)
-
+	fmt.Println(l.renderColumn(rows...))
 	return nil
 }

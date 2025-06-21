@@ -1,32 +1,20 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/CosmicPredator/chibi/internal/ui"
+	"github.com/charmbracelet/fang"
 	"github.com/spf13/cobra"
 )
 
-var isVersionCmd bool
-var appVersion string = "develop"
-
 var rootCmd = &cobra.Command{
 	Use:  "chibi",
-	Long: "Chibi for AniList - A lightweight anime & manga tracker CLI app powered by AniList.",
-	Run: func(cmd *cobra.Command, args []string) {
-		if isVersionCmd {
-			fmt.Printf("chibi version %s\n", appVersion)
-		} else {
-			cmd.Help()
-		}
-	},
-}
-
-func init() {
-	rootCmd.Flags().BoolVarP(&isVersionCmd, "version", "v", false, "prints the version of chibi")
+	Long: "Chibi for AniList - A lightweight anime & manga tracker CLI app powered by AniList.\nRead the documentation at https://chibi-cli.pages.dev/",
 }
 
 func Execute(version string) {
-	appVersion = version
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.AddCommand(
 		loginCmd,
@@ -37,5 +25,11 @@ func Execute(version string) {
 		mediaUpdateCmd,
 		mediaAddCmd,
 	)
-	rootCmd.Execute()
+	if err := fang.Execute(
+		context.TODO(), 
+		rootCmd, 
+		fang.WithVersion(version),
+		); err != nil {
+		fmt.Println(ui.ErrorText(err))
+	}
 }

@@ -55,6 +55,9 @@ const viewerQuery = `query {
     Viewer {
         id
         name
+		avatar {
+			large
+		}
         statistics {
             anime {
                 count

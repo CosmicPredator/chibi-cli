@@ -2,22 +2,8 @@ package internal
 
 import (
 	"os"
-	"path"
+	"strings"
 )
-
-// creates a directory "chibi" in os specific config folder.
-// in unix-like systems, the path is /home/user/.config/chibi.
-// in windows, the path is %AppData%\chibi
-func CreateConfigDir() {
-	osConfigPath, _ := os.UserConfigDir()
-	configDir := path.Join(osConfigPath, "chibi")
-	_, err := os.Stat(configDir)
-
-	if err == nil {
-		os.RemoveAll(configDir)
-	}
-	os.MkdirAll(configDir, 0755)
-}
 
 // maps "type" command line argument string to valid
 // MediaType enum required by AniList API
@@ -74,4 +60,32 @@ func MediaFormatFormatter(mediaFormat string) string {
 	default:
 		return "?"
 	}
+}
+
+func CanSupportKittyGP() bool {
+    term := os.Getenv("TERM")
+    termProgram := os.Getenv("TERM_PROGRAM")
+    konsoleVersion := os.Getenv("KONSOLE_VERSION")
+
+    if strings.Contains(strings.ToLower(term), "ghostty") {
+        return true
+    }
+    if konsoleVersion != "" {
+        return true
+    }
+    if strings.HasPrefix(strings.ToLower(term), "xterm-kitty") {
+        return true
+    }
+    if strings.Contains(strings.ToLower(termProgram), "warp") {
+        return true
+    }
+    if strings.Contains(strings.ToLower(term), "wayst") {
+        return true
+    }
+    if strings.Contains(strings.ToLower(termProgram), "wezterm") ||
+        strings.Contains(strings.ToLower(term), "wezterm") {
+        return true
+    }
+
+    return false
 }

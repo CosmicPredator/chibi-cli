@@ -2,12 +2,13 @@ package viewmodel
 
 import (
 	"context"
+	"errors"
 	"strconv"
 
 	"github.com/CosmicPredator/chibi/internal"
 	"github.com/CosmicPredator/chibi/internal/api"
 	"github.com/CosmicPredator/chibi/internal/api/responses"
-	"github.com/CosmicPredator/chibi/internal/db"
+	"github.com/CosmicPredator/chibi/internal/credstore"
 	"github.com/CosmicPredator/chibi/internal/ui"
 )
 
@@ -17,13 +18,9 @@ func HandleMediaList(mediaType, mediaStatus string) error {
 	mediaStatus = internal.MediaStatusEnumMapper(mediaStatus)
 
 	// get user id
-	dbCtx, err := db.NewDbConn(false)
+	userId, err := credstore.GetCredential("user_id")
 	if err != nil {
-		return err
-	}
-	userId, err := dbCtx.GetConfig("user_id")
-	if err != nil {
-		return err
+		return errors.New("not logged in. Please use \"chibi login\" to continue")
 	}
 
 	userIdInt, err := strconv.Atoi(*userId)
