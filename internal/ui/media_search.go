@@ -2,97 +2,83 @@ package ui
 
 import (
 	"fmt"
-	"os"
 	"strconv"
+	"strings"
 
 	"github.com/CosmicPredator/chibi/internal"
 	"github.com/CosmicPredator/chibi/internal/api/responses"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/lipgloss/table"
-	"github.com/charmbracelet/x/term"
 )
 
 type MediaSearchUI struct {
 	MediaList *[]responses.MediaSearchList
 }
 
-// table renderer for media search results
-func (ms *MediaSearchUI) renderTable(rows ...[]string) (*table.Table, error) {
-	tw, _, err := term.GetSize((os.Stdout.Fd()))
-	if err != nil {
-		return nil, err
+type MediaSearchResult struct {
+	Id string
+	Title string
+	Format string
+	Score string
+}
+
+func (l *MediaSearchUI) renderColumn(entries ...*MediaSearchResult) string {
+	col := func(w int) lipgloss.Style {
+		return lipgloss.NewStyle().Width(w).MarginRight(2).Align(lipgloss.Right)
 	}
 
-	tw = int(float32(tw) * float32(0.9))
+	styles := []lipgloss.Style{
+		col(7),
+		col(8),
+		col(8),
+		col(0),
+	}
 
-	table := table.New().
-		Border(lipgloss.RoundedBorder()).
-		BorderStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("99"))).
-		StyleFunc(func(row, col int) lipgloss.Style {
-			// style for table header row
-			if row == -1 {
-				return lipgloss.
-					NewStyle().
-					Foreground(lipgloss.Color("#FF79C6")).
-					Bold(true).
-					Align(lipgloss.Center)
-			}
+	headerStyle := func (style lipgloss.Style) lipgloss.Style {
+		return style.MarginBottom(1).Underline(true).Bold(true).Foreground(lipgloss.ANSIColor(5))
+	}
 
-			if row%2 == 0 && (col == 0 || col == 2 || col == 3) {
-				return lipgloss.NewStyle().Align(lipgloss.Center).Faint(true)
-			}
+	var sb strings.Builder
+	header := []string{
+		headerStyle(styles[0]).Render("ID"),
+		headerStyle(styles[1]).Render("FORMAT"),
+		headerStyle(styles[2]).Render("SCORE"),
+		headerStyle(styles[3]).Render("TITLE"),
+	}
 
-			// force title column to wrap by specifying terminal width
-			if col == 1 {
-				colStyle := lipgloss.
-					NewStyle().
-					Align(lipgloss.Center).
-					PaddingLeft(2).
-					PaddingRight(2).
-					Width((tw - 6) / 3).Inline(true)
-				if row%2 == 0 {
-					colStyle = colStyle.Faint(true)
-				}
-				return colStyle
-			}
+	sb.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, header...) + "\n")
+	for _, entry := range entries {
+		row := []string{
+			styles[0].Foreground(lipgloss.ANSIColor(6)).Render(entry.Id),
+			styles[1].Foreground(lipgloss.ANSIColor(2)).Render(entry.Format),
+			styles[2].Foreground(lipgloss.ANSIColor(3)).Render(entry.Score),
+			styles[3].Render(entry.Title),
+		}
+		sb.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, row...) + "\n")
+	}
 
-			return lipgloss.
-				NewStyle().
-				Align(lipgloss.Center).
-				PaddingLeft(2).
-				PaddingRight(2)
-		}).
-		Headers("ID", "TITLE", "FORMAT", "SCORE").
-		Rows(rows...).Width(tw)
-
-	return table, nil
+	return sb.String()
 }
 
 // render UI string
 func (ms *MediaSearchUI) Render() error {
-	rows := [][]string{}
+	var rows []*MediaSearchResult = make([]*MediaSearchResult, 0)
 
 	for _, media := range *ms.MediaList {
 		var averageScore string
 		if media.AverageScore == nil {
 			averageScore = "?"
 		} else {
-			averageScore = fmt.Sprintf("%.2f", *media.AverageScore)
+			averageScore = fmt.Sprintf("%.0f%%", *media.AverageScore)
 		}
 
-		rows = append(rows, []string{
-			strconv.Itoa(media.Id),
-			media.Title.UserPreferred,
-			internal.MediaFormatFormatter(media.MediaFormat),
-			averageScore,
+		rows = append(rows, &MediaSearchResult{
+			Id: strconv.Itoa(media.Id),
+			Title: media.Title.UserPreferred,
+			Format: internal.MediaFormatFormatter(media.MediaFormat),
+			Score: averageScore,
 		})
 	}
 
-	table, err := ms.renderTable(rows...)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(table)
+	fmt.Println(ms.renderColumn(rows...))
 	return nil
 }
