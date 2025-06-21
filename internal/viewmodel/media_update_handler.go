@@ -10,10 +10,8 @@ import (
 	"github.com/CosmicPredator/chibi/internal"
 	"github.com/CosmicPredator/chibi/internal/api"
 	"github.com/CosmicPredator/chibi/internal/api/responses"
-	"github.com/CosmicPredator/chibi/internal/db"
+	"github.com/CosmicPredator/chibi/internal/credstore"
 	"github.com/CosmicPredator/chibi/internal/ui"
-	"github.com/charmbracelet/huh"
-	"github.com/charmbracelet/huh/spinner"
 )
 
 type MediaUpdateParams struct {
@@ -32,12 +30,13 @@ func getCurrentProgress(userId int, mediaId int) (current int, total *int, err e
 	var mediaList *responses.MediaList
 
 	// load medialist collection
-	err = spinner.New().Title("Getting your list...").Action(func() {
+	err = ui.ActionSpinner("Getting your list...", func(ctx context.Context) error {
 		mediaList, err = api.GetMediaList(
 			userId,
 			[]string{"CURRENT", "REPEATING"},
 		)
-	}).Run()
+		return err
+	})
 
 	if err != nil {
 		return
@@ -134,44 +133,59 @@ func handleNewAdditionAction(params MediaUpdateParams) error {
 // this func gets invoked when the current progress
 // matches the total progress
 func handleMediaCompletedAction(params MediaUpdateParams, progress int) error {
-	currDate := fmt.Sprintf("%d/%02d/%d\n", time.Now().Day(), time.Now().Month(), time.Now().Year())
+	defaultDate := fmt.Sprintf("%d/%02d/%d", time.Now().Day(), time.Now().Month(), time.Now().Year())
+	var currDate string 
 	var scoreString string
 	var notes string
 
-	// display a series of huh! forms
+	// display a series of forms
 	// 1. Completed Data
+	for {
+		input, err := ui.PrettyInput("Completed Date", defaultDate, func(s string) error {
+			if strings.TrimSpace(s) == "" {
+				return nil
+			}
+			layout := "02/01/2006"
+			_, err := time.Parse(layout, strings.TrimSpace(s))
+			return err
+		})
+		if err != nil {
+			fmt.Println(ui.ErrorText(err))
+			continue
+		}
+		currDate = strings.TrimSpace(input)
+		if currDate == "" {
+			currDate = defaultDate
+		}
+		break
+	}
+
 	// 2. Notes
+	for {
+		input, err := ui.PrettyInput("Notes", "", func(s string) error {
+			return nil
+		})
+		if err != nil {
+			fmt.Println(ui.ErrorText(err))
+			continue
+		}
+		notes = input
+		break
+	}
+
 	// 3. Score
-	huh.NewForm(
-		huh.NewGroup(
-			huh.NewInput().
-				Title("Completed Date").
-				Value(&currDate).
-				Description("Date should be in format DD/MM/YYYY").
-				Validate(func(s string) error {
-					layout := "02/01/2006"
-					_, err := time.Parse(layout, strings.TrimSpace(s))
-					return err
-				}),
-		),
-		huh.NewGroup(
-			huh.NewText().
-				Title("Notes").
-				Description("Note: you can add multiple lines").
-				Value(&notes),
-		),
-		huh.NewGroup(
-			huh.NewInput().
-				Title("Score").
-				Description("If your score is in emoji, type 1 for 😞, 2 for 😐 and 3 for 😊").
-				Prompt("> ").
-				Validate(func(s string) error {
-					_, err := strconv.ParseFloat(s, 64)
-					return err
-				}).
-				Value(&scoreString),
-		),
-	).Run()
+	for {
+		input, err := ui.PrettyInput("Score (use 1, 2, 3 for emojis)", "", func(s string) error {
+			_, err := strconv.ParseFloat(s, 64)
+			return err
+		})
+		if err != nil {
+			fmt.Println(ui.ErrorText(err))
+			continue
+		}
+		scoreString = input
+		break
+	}
 
 	// parse form strings to API required data type
 	completedDate, err := time.Parse("02/01/2006", strings.TrimSpace(currDate))
@@ -225,11 +239,7 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 		return nil
 	}
 
-	dbCtx, err := db.NewDbConn(false)
-	if err != nil {
-		return err
-	}
-	userId, err := dbCtx.GetConfig("user_id")
+	userId, err := credstore.GetCredential("user_id")
 	if err != nil {
 		return err
 	}

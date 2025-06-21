@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/CosmicPredator/chibi/internal"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -58,23 +59,33 @@ func (p *ProfileUI) Render() error {
 	// iterating over dataSlice and adding the KV pairs to String Builder
 	// with appropriate padding
 	for _, kv := range dataSlice {
-		sb.WriteString(
-			fmt.Sprintf(
-				"%*s%s : %s\n",
-				20, "",
-				keyStyle.MarginRight(maxKeyLen-len(kv.Key)).Render(kv.Key),
-				valueStyle.Render(kv.Value),
-			),
-		)
+		if internal.CanSupportKittyGP() {
+			sb.WriteString(
+				fmt.Sprintf(
+					"%*s%s : %s\n",
+					20, "",
+					keyStyle.MarginRight(maxKeyLen-len(kv.Key)).Render(kv.Key),
+					valueStyle.Render(kv.Value),
+				),
+			)
+		} else {
+			sb.WriteString(
+				fmt.Sprintf(
+					"%s : %s\n",
+					keyStyle.MarginRight(maxKeyLen-len(kv.Key)).Render(kv.Key),
+					valueStyle.Render(kv.Value),
+				),
+			)
+		}
 	}
 
 	// Display the output
-	RenderWithImage(
-		p.AvatarUrl, 
-		sb.String(), 
+	err := RenderWithImage(
+		p.AvatarUrl,
+		sb.String(),
 		KGPParams{
 			R: "7",
 			C: "15",
-		},8)
-	return nil
+		}, 8)
+	return err
 }

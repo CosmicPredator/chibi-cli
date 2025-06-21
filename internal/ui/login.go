@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/charmbracelet/huh"
 )
 
 type LoginUI struct {
@@ -33,16 +31,19 @@ func (l *LoginUI) Render() error {
 	fmt.Print(sb.String())
 
 	// display token entry form
-	err := huh.NewText().
-		Title("Paste your token here").
-		Value(&l.token).
-		CharLimit(2000).
-		Validate(func(s string) error {
+	for {
+		data, err := PrettyInput("Paste your token here", "", func(s string) error {
 			if s == "" {
 				return errors.New("please provide a valid token")
 			}
 			return nil
-		}).
-		Run()
-	return err
+		})
+		if err != nil {
+			fmt.Println(ErrorText(err))
+			continue
+		}
+		l.token = data
+		break
+	}
+	return nil
 }
