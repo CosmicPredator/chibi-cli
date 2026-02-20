@@ -3,6 +3,7 @@ package ui
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/charmbracelet/lipgloss"
@@ -59,10 +60,10 @@ func ActionSpinner(title string, action func(context.Context) error) error {
         for {
             select {
             case <-done:
-                fmt.Print("\r\033[K")
+                fmt.Fprintf(os.Stderr, "\r\033[K")
                 return
             default:
-                fmt.Printf("\r%s %s", styledDots[i], title)
+                fmt.Fprintf(os.Stderr, "\r%s %s", styledDots[i], title)
                 time.Sleep(150 * time.Millisecond)
                 i = (i + 1) % len(dots)
             }

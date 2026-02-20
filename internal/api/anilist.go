@@ -109,6 +109,24 @@ func GetMediaList(userId int, mediaStatusIn []string) (*responses.MediaList, err
 	return &responseStruct, nil
 }
 
+func GetMediaInfo(id int) (*responses.MediaInfo, error) {
+	payload := map[string]any{
+		"id": id,
+	}
+	response, err := queryAnilist(mediaInfoQuery, payload)
+	if err != nil {
+		return nil, err
+	}
+	
+	var responseStruct responses.MediaInfo
+	err = json.Unmarshal(response, &responseStruct)
+	if err != nil {
+		return nil, err
+	}
+	
+	return &responseStruct, nil
+}
+
 // Herlper function to get details about the
 // logged user
 func GetUserProfile() (*responses.Profile, error) {

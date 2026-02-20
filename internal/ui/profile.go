@@ -20,13 +20,6 @@ type ProfileUI struct {
 	SiteUrl        string
 }
 
-// Simple Key Value pair used for ordered output
-// since map produces unordered kv pairs while iterating
-type KV struct {
-	Key   string
-	Value string
-}
-
 func (p *ProfileUI) Render() error {
 	// convert minutes to days
 	daysWatched := float32(p.MinutesWatched) / 1440
@@ -60,22 +53,14 @@ func (p *ProfileUI) Render() error {
 	// with appropriate padding
 	for _, kv := range dataSlice {
 		if internal.CanSupportKittyGP() {
-			sb.WriteString(
-				fmt.Sprintf(
-					"%*s%s : %s\n",
-					20, "",
-					keyStyle.MarginRight(maxKeyLen-len(kv.Key)).Render(kv.Key),
-					valueStyle.Render(kv.Value),
-				),
-			)
+			fmt.Fprintf(&sb, "%*s%s : %s\n",
+						20, "",
+						keyStyle.MarginRight(maxKeyLen-len(kv.Key)).Render(kv.Key),
+						valueStyle.Render(kv.Value))
 		} else {
-			sb.WriteString(
-				fmt.Sprintf(
-					"%s : %s\n",
-					keyStyle.MarginRight(maxKeyLen-len(kv.Key)).Render(kv.Key),
-					valueStyle.Render(kv.Value),
-				),
-			)
+			fmt.Fprintf(&sb, "%s : %s\n",
+						keyStyle.MarginRight(maxKeyLen-len(kv.Key)).Render(kv.Key),
+						valueStyle.Render(kv.Value))
 		}
 	}
 
