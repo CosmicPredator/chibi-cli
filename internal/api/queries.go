@@ -71,3 +71,34 @@ const viewerQuery = `query {
         siteUrl
     }
 }`
+
+const mediaInfoQuery = `query($id: Int) {
+  Media(id: $id) {
+    id
+    idMal
+    title {
+      english
+      romaji
+      native
+    }
+    meanScore
+    coverImage {
+      extraLarge
+    }
+    genres
+    tags {
+      name
+    }
+    studios {
+      nodes {
+        name
+      }
+    }
+    description
+    format
+    episodes
+    duration
+    chapters
+    volumes
+  }
+}`

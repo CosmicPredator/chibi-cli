@@ -5,6 +5,7 @@ go 1.24.0
 require (
 	github.com/charmbracelet/fang v0.1.0
 	github.com/charmbracelet/lipgloss v1.1.0
+	github.com/muesli/reflow v0.3.0
 	github.com/spf13/cobra v1.9.1
 	github.com/zalando/go-keyring v0.2.6
 )
