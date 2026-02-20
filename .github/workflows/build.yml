@@ -1,8 +1,7 @@
 name: Build (Multiple Arch)
 
 on:
-  pull_request: 
-    branches: [ develop ]
+  pull_request:
   workflow_dispatch:
 
 jobs:
