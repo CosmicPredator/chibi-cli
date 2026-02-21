@@ -8,7 +8,7 @@ import (
 	"github.com/CosmicPredator/chibi/internal"
 	"github.com/CosmicPredator/chibi/internal/api"
 	"github.com/CosmicPredator/chibi/internal/api/responses"
-	"github.com/CosmicPredator/chibi/internal/credstore"
+	"github.com/CosmicPredator/chibi/internal/kvdb"
 	"github.com/CosmicPredator/chibi/internal/ui"
 )
 
@@ -23,10 +23,16 @@ func HandleLogin() error {
 	}
 
 	// write access token to db
-	err = credstore.SetCredential("auth_token", loginUI.GetAuthToken())
+	db, err := kvdb.Open()
 	if err != nil {
 		return err
 	}
+	
+	err = db.Set(context.TODO(), "auth_token", []byte(loginUI.GetAuthToken()))
+	if err != nil {
+		return err
+	}
+	defer db.Close()
 
 	// gets user profile details from api and saves
 	// the username and ID to db
@@ -39,12 +45,12 @@ func HandleLogin() error {
 		return err
 	}
 
-	err = credstore.SetCredential("user_id", strconv.Itoa(profile.Data.Viewer.Id))
+	err = db.Set(context.TODO(), "user_id", []byte(strconv.Itoa(profile.Data.Viewer.Id)))
 	if err != nil {
 		return err
 	}
 
-	err = credstore.SetCredential("user_name", profile.Data.Viewer.Name)
+	err = db.Set(context.TODO(), "user_name", []byte(profile.Data.Viewer.Name))
 	if err != nil {
 		return err
 	}
