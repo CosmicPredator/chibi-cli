@@ -4,6 +4,12 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "Chibi CLI Docs",
   description: "Docs and Guides for Chibi for AniList",
+  markdown: {
+    theme: {
+      light: "catppuccin-mocha",
+      dark: "catppuccin-mocha"
+    }
+  },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [

@@ -8,6 +8,7 @@ hero:
   image: 
     src: https://i.imgur.com/qQ6Qs0v.png
     alt: Chibi Logo
+    width: 200
   actions:
     - theme: brand
       text: Getting Started
