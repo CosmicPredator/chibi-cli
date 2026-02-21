@@ -2,6 +2,7 @@ package viewmodel
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -10,7 +11,7 @@ import (
 	"github.com/CosmicPredator/chibi/internal"
 	"github.com/CosmicPredator/chibi/internal/api"
 	"github.com/CosmicPredator/chibi/internal/api/responses"
-	"github.com/CosmicPredator/chibi/internal/credstore"
+	"github.com/CosmicPredator/chibi/internal/kvdb"
 	"github.com/CosmicPredator/chibi/internal/ui"
 )
 
@@ -239,12 +240,24 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 		return nil
 	}
 
-	userId, err := credstore.GetCredential("user_id")
+	
+	// get user id
+	db, err := kvdb.Open()
+	if err != nil {
+		return fmt.Errorf("unable to open databse: %w", err)
+	}
+	defer db.Close()
+	
+	userId, err := db.Get(context.TODO(), "user_id")
+	if err != nil {
+		return errors.New("not logged in. Please use \"chibi login\" to continue")
+	}
+
+	userIdInt, err := strconv.Atoi(string(userId))
 	if err != nil {
 		return err
 	}
-
-	userIdInt, _ := strconv.Atoi(*userId)
+	
 	current, total, err := getCurrentProgress(userIdInt, params.MediaId)
 	if err != nil {
 		return err

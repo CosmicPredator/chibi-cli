@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,7 +11,7 @@ import (
 
 	"github.com/CosmicPredator/chibi/internal"
 	"github.com/CosmicPredator/chibi/internal/api/responses"
-	"github.com/CosmicPredator/chibi/internal/credstore"
+	"github.com/CosmicPredator/chibi/internal/kvdb"
 )
 
 // Helper function to parse query string and variable map
@@ -31,14 +32,20 @@ func queryAnilist(query string, variables map[string]any) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	
+	db, err := kvdb.Open()
+	if err != nil {
+		return nil, fmt.Errorf("unable to open database: %w", err)
+	}
+	defer db.Close()
 
-	token, err := credstore.GetCredential("auth_token")
+	token, err := db.Get(context.TODO(), "auth_token")
 	if err != nil {
 		return nil, errors.New("not logged in. Please use \"chibi login\" to continue")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+*token)
+	req.Header.Set("Authorization", "Bearer "+string(token))
 
 	httpClient := &http.Client{}
 	resp, err := httpClient.Do(req)
@@ -106,6 +113,24 @@ func GetMediaList(userId int, mediaStatusIn []string) (*responses.MediaList, err
 		return nil, err
 	}
 
+	return &responseStruct, nil
+}
+
+func GetMediaInfo(id int) (*responses.MediaInfo, error) {
+	payload := map[string]any{
+		"id": id,
+	}
+	response, err := queryAnilist(mediaInfoQuery, payload)
+	if err != nil {
+		return nil, err
+	}
+	
+	var responseStruct responses.MediaInfo
+	err = json.Unmarshal(response, &responseStruct)
+	if err != nil {
+		return nil, err
+	}
+	
 	return &responseStruct, nil
 }
 

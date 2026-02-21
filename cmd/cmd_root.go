@@ -24,6 +24,7 @@ func Execute(version string) {
 		mediaListCmd,
 		mediaUpdateCmd,
 		mediaAddCmd,
+		mediaInfoCmd,
 	)
 	if err := fang.Execute(
 		context.TODO(), 

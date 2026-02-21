@@ -7,7 +7,7 @@ package internal
 const (
 	API_ENDPOINT     = "https://graphql.anilist.co"
 	AUTH_URL         = "https://anilist.co/api/v2/oauth/authorize?client_id=4593&response_type=token"
-	DB_NAME          = "chibi_config.db"
+	DB_PATH          = "chibi_config.db"
 )
 
 type MediaType string
