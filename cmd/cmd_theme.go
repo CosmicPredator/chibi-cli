@@ -14,6 +14,11 @@ func handleTheme(_ *cobra.Command, args []string) {
 		fmt.Printf("Current theme: %s\n", theme.CurrentName())
 		fmt.Printf("Available themes: %s\n", strings.Join(theme.Available(), ", "))
 		fmt.Println("Set a theme with: chibi theme <name>")
+		if themesPath, err := theme.ThemesPath(); err == nil {
+			fmt.Printf("Add your own theme: create a .toml file in %s\n", themesPath)
+		} else {
+			fmt.Println("Add your own theme: create a .toml file in DATA_DIR/themes")
+		}
 		return
 	}
 
