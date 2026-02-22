@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/CosmicPredator/chibi/internal/theme"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/reflow/wordwrap"
 )
@@ -54,8 +55,9 @@ func (m *MediaInfoUI) Render() error {
 	sep := " : "
 	valueIndent := strings.Repeat(" ", maxKeyLen+len(sep))
 
-	keyStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF79C6"))
-	valueStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#8BE9FD"))
+	palette := theme.Current()
+	keyStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(palette.KeyText))
+	valueStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(palette.ValueText))
 
 	var sb strings.Builder
 	for _, kv := range dataSlice {
