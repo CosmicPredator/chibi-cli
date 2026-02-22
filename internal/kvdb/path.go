@@ -23,3 +23,7 @@ func resolveDataPath() (string, error) {
 	}
 	return filepath.Join(path, internal.APP_DIR_NAME), nil
 }
+
+func DataPath() (string, error) {
+	return resolveDataPath()
+}
