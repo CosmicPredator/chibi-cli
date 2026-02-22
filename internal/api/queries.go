@@ -102,3 +102,19 @@ const mediaInfoQuery = `query($id: Int) {
     volumes
   }
 }`
+
+const mediaNextAiringDateQuery = `query($id: Int) {
+  Media(id: $id) {
+    id
+    type
+    status
+    title {
+      userPreferred
+    }
+    nextAiringEpisode {
+      episode
+      airingAt
+      timeUntilAiring
+    }
+  }
+}`
