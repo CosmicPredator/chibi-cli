@@ -32,7 +32,7 @@ func queryAnilist(query string, variables map[string]any) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	db, err := kvdb.Open()
 	if err != nil {
 		return nil, fmt.Errorf("unable to open database: %w", err)
@@ -124,13 +124,37 @@ func GetMediaInfo(id int) (*responses.MediaInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	var responseStruct responses.MediaInfo
 	err = json.Unmarshal(response, &responseStruct)
 	if err != nil {
 		return nil, err
 	}
-	
+
+	return &responseStruct, nil
+}
+
+func GetMediaNextAiringDate(id int) (*responses.MediaNextAiring, error) {
+	payload := map[string]any{
+		"id": id,
+	}
+	response, err := queryAnilist(mediaNextAiringDateQuery, payload)
+	if err != nil {
+		return nil, err
+	}
+
+	var responseStruct responses.MediaNextAiring
+	err = json.Unmarshal(response, &responseStruct)
+	if err != nil {
+		return nil, err
+	}
+	if len(responseStruct.Errors) > 0 {
+		return nil, errors.New(responseStruct.Errors[0].Message)
+	}
+	if responseStruct.Data.Media == nil {
+		return nil, errors.New("no media found for the provided id")
+	}
+
 	return &responseStruct, nil
 }
 
