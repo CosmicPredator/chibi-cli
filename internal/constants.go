@@ -9,6 +9,7 @@ const (
 	AUTH_URL        = "https://anilist.co/api/v2/oauth/authorize?client_id=4593&response_type=token"
 	APP_DIR_NAME    = "chibi"
 	DB_PATH         = "chibi_config.db"
+	THEME_ENV       = "CHIBI_THEME"
 	DATA_PATH_ENV   = "CHIBI_DATA_PATH"
 	LEGACY_PATH_ENV = "CHIBI_PATH"
 )
