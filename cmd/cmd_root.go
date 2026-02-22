@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/CosmicPredator/chibi/internal/theme"
 	"github.com/CosmicPredator/chibi/internal/ui"
 	"github.com/charmbracelet/fang"
 	"github.com/spf13/cobra"
@@ -15,6 +16,12 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute(version string) {
+	if err := theme.Load(); err != nil {
+		fmt.Println(ui.ErrorText(err))
+		return
+	}
+	applyThemeToMessageTemplates()
+
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.AddCommand(
 		loginCmd,
@@ -25,12 +32,13 @@ func Execute(version string) {
 		mediaUpdateCmd,
 		mediaAddCmd,
 		mediaInfoCmd,
+		themeCmd,
 	)
 	if err := fang.Execute(
-		context.TODO(), 
-		rootCmd, 
+		context.TODO(),
+		rootCmd,
 		fang.WithVersion(version),
-		); err != nil {
+	); err != nil {
 		fmt.Println(ui.ErrorText(err))
 	}
 }
