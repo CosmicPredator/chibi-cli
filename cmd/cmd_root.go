@@ -25,12 +25,13 @@ func Execute(version string) {
 		mediaUpdateCmd,
 		mediaAddCmd,
 		mediaInfoCmd,
+		mediaNextDateCmd,
 	)
 	if err := fang.Execute(
-		context.TODO(), 
-		rootCmd, 
+		context.TODO(),
+		rootCmd,
 		fang.WithVersion(version),
-		); err != nil {
+	); err != nil {
 		fmt.Println(ui.ErrorText(err))
 	}
 }
