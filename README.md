@@ -69,6 +69,24 @@ PS C:\> winget install CosmicPredator.Chibi
 >    $ chmod +x ./chibi
 >    ```
 
+### Custom Data Directory
+By default, Chibi stores local data in your OS config directory under `chibi`.
+
+You can override this path with environment variables:
+- `CHIBI_DATA_PATH` (preferred)
+- `CHIBI_PATH` (legacy fallback)
+
+Examples:
+```bash
+export CHIBI_DATA_PATH="$HOME/.local/share/chibi"
+chibi login
+```
+
+```pwsh
+$env:CHIBI_DATA_PATH = "D:\apps\chibi-data"
+chibi login
+```
+
 ## Documentation
 You can check the docs [here](https://chibi-cli.pages.dev/).
 
