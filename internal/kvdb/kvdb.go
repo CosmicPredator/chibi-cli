@@ -16,16 +16,15 @@ type KV struct {
 }
 
 func Open() (*KV, error) {
-	path, err := os.UserConfigDir()
+	dbDirPath, err := resolveDataPath()
 	if err != nil {
-		return nil, fmt.Errorf("unable to get user config path: %w", err)
+		return nil, err
 	}
-	dbDirPath := filepath.Join(path, "chibi")
-	if _, err := os.Stat(dbDirPath); err != nil {
-		os.MkdirAll(dbDirPath, 0o755)
+	if err := os.MkdirAll(dbDirPath, 0o755); err != nil {
+		return nil, fmt.Errorf("unable to create config path: %w", err)
 	}
 	dbPath := filepath.Join(dbDirPath, internal.DB_PATH)
-	
+
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return nil, err
@@ -44,7 +43,6 @@ func Open() (*KV, error) {
 
 	return &KV{db: db}, nil
 }
-
 
 func (k *KV) Set(ctx context.Context, key string, value []byte) error {
 	_, err := k.db.ExecContext(ctx,
