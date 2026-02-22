@@ -87,6 +87,22 @@ $env:CHIBI_DATA_PATH = "D:\apps\chibi-data"
 chibi login
 ```
 
+### Themes
+Chibi supports built-in themes for CLI colors.
+
+- Show active theme and available themes:
+  ```bash
+  chibi theme
+  ```
+- Persist a theme:
+  ```bash
+  chibi theme nord
+  ```
+- Temporarily override via environment variable:
+  ```bash
+  CHIBI_THEME=sunset chibi profile
+  ```
+
 ## Documentation
 You can check the docs [here](https://chibi-cli.pages.dev/).
 
