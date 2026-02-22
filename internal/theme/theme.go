@@ -12,11 +12,11 @@ import (
 	"sync"
 
 	"github.com/BurntSushi/toml"
+	"github.com/CosmicPredator/chibi/internal"
 	"github.com/CosmicPredator/chibi/internal/kvdb"
 )
 
 const (
-	ThemeEnvName     = "CHIBI_THEME"
 	themeKey         = "theme"
 	themesDirName    = "themes"
 	defaultThemeName = "default"
@@ -336,7 +336,7 @@ func Load() error {
 	current = defaultThemeName
 	mu.Unlock()
 
-	if envTheme := strings.TrimSpace(os.Getenv(ThemeEnvName)); envTheme != "" {
+	if envTheme := strings.TrimSpace(os.Getenv(internal.THEME_ENV)); envTheme != "" {
 		return SetCurrent(envTheme)
 	}
 
