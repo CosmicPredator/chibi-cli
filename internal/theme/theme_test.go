@@ -56,7 +56,7 @@ func TestSaveAndLoadPersistedTheme(t *testing.T) {
 	defer resetDefaultTheme(t)
 
 	t.Setenv(internal.DATA_PATH_ENV, t.TempDir())
-	t.Setenv(ThemeEnvName, "")
+	t.Setenv(internal.THEME_ENV, "")
 
 	if err := Save("sunset"); err != nil {
 		t.Fatalf("Save returned error: %v", err)
@@ -79,7 +79,7 @@ func TestEnvThemeOverridesPersistedTheme(t *testing.T) {
 	defer resetDefaultTheme(t)
 
 	t.Setenv(internal.DATA_PATH_ENV, t.TempDir())
-	t.Setenv(ThemeEnvName, "nord")
+	t.Setenv(internal.THEME_ENV, "nord")
 
 	if err := Save("sunset"); err != nil {
 		t.Fatalf("Save returned error: %v", err)
@@ -103,7 +103,7 @@ func TestLoadReadsThemeFilesFromDataPath(t *testing.T) {
 
 	dataPath := t.TempDir()
 	t.Setenv(internal.DATA_PATH_ENV, dataPath)
-	t.Setenv(ThemeEnvName, "")
+	t.Setenv(internal.THEME_ENV, "")
 
 	writeThemeFile(t, dataPath, "ocean.toml", `
 name = "ocean"
@@ -148,7 +148,7 @@ func TestLoadThemeNameFallsBackToFileName(t *testing.T) {
 
 	dataPath := t.TempDir()
 	t.Setenv(internal.DATA_PATH_ENV, dataPath)
-	t.Setenv(ThemeEnvName, "")
+	t.Setenv(internal.THEME_ENV, "")
 
 	writeThemeFile(t, dataPath, "retro.toml", `
 success_text = "#A6E22E"
