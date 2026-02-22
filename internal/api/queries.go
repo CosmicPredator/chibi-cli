@@ -28,6 +28,10 @@ const mediaListQuery = `query ($id: Int, $statusIn: [MediaListStatus]) {
 					episodes
 					chapters
 					format
+		            nextAiringEpisode {
+		                airingAt
+		                timeUntilAiring
+		            }
 				}
 			}
 		}

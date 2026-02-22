@@ -20,16 +20,33 @@ type MediaListEntry struct {
 	Title string
 	Format string
 	Progress string
+	NextEpEpoch int64
 }
 
-func (l *MediaListUI) renderColumn(entries ...*MediaListEntry) string {
+func (l *MediaListUI) renderColumn(mediaType internal.MediaType, entries ...*MediaListEntry) string {
 	col := func(w int) lipgloss.Style {
 		return lipgloss.NewStyle().Width(w).MarginRight(2).Align(lipgloss.Right)
+	}
+	
+	epFormatCol := func() string {
+		if mediaType == internal.ANIME {
+			return "NEXT EP IN"
+		} else {
+			return "FORMAT"
+		}
+	}()
+	
+	epFormatValue := func(entry *MediaListEntry) string {
+		if mediaType == internal.ANIME {
+			return internal.FormatAiringTs(entry.NextEpEpoch)
+		} else {
+			return entry.Format
+		}
 	}
 
 	styles := []lipgloss.Style{
 		col(7),
-		col(8),
+		col(10),
 		col(8),
 		col(0),
 	}
@@ -41,7 +58,7 @@ func (l *MediaListUI) renderColumn(entries ...*MediaListEntry) string {
 	var sb strings.Builder
 	header := []string{
 		headerStyle(styles[0]).Render("ID"),
-		headerStyle(styles[1]).Render("FORMAT"),
+		headerStyle(styles[1]).Render(epFormatCol),
 		headerStyle(styles[2]).Render("PROGRESS"),
 		headerStyle(styles[3]).Render("TITLE"),
 	}
@@ -50,7 +67,7 @@ func (l *MediaListUI) renderColumn(entries ...*MediaListEntry) string {
 	for _, entry := range entries {
 		row := []string{
 			styles[0].Foreground(lipgloss.ANSIColor(6)).Render(entry.Id),
-			styles[1].Foreground(lipgloss.ANSIColor(2)).Render(entry.Format),
+			styles[1].Foreground(lipgloss.ANSIColor(2)).Render(epFormatValue(entry)),
 			styles[2].Foreground(lipgloss.ANSIColor(3)).Render(entry.Progress),
 			styles[3].Render(entry.Title),
 		}
@@ -71,6 +88,10 @@ func (l *MediaListUI) Render() error {
 	}
 
 	for _, list := range selectedList.Lists {
+		if list.Status != "CURRENT" && list.Status != "REPEATING" {
+        	continue
+    	}
+		
 		for _, entry := range list.Entries {
 			var progress string
 
@@ -105,10 +126,11 @@ func (l *MediaListUI) Render() error {
 				Title: entry.Media.Title.UserPreferred,
 				Format: internal.MediaFormatFormatter(entry.Media.MediaFormat),
 				Progress: progress,
+				NextEpEpoch: entry.Media.NextAiringEpisode.AiringAt,
 			})
 		}
 	}
 
-	fmt.Println(l.renderColumn(rows...))
+	fmt.Println(l.renderColumn(internal.MediaType(l.MediaType), rows...))
 	return nil
 }

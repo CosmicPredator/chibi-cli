@@ -1,8 +1,10 @@
 package internal
 
 import (
+	"fmt"
 	"os"
 	"strings"
+	"time"
 )
 
 // maps "type" command line argument string to valid
@@ -63,29 +65,42 @@ func MediaFormatFormatter(mediaFormat string) string {
 }
 
 func CanSupportKittyGP() bool {
-    term := os.Getenv("TERM")
-    termProgram := os.Getenv("TERM_PROGRAM")
-    konsoleVersion := os.Getenv("KONSOLE_VERSION")
+	term := os.Getenv("TERM")
+	termProgram := os.Getenv("TERM_PROGRAM")
+	konsoleVersion := os.Getenv("KONSOLE_VERSION")
 
-    if strings.Contains(strings.ToLower(term), "ghostty") {
-        return true
-    }
-    if konsoleVersion != "" {
-        return true
-    }
-    if strings.HasPrefix(strings.ToLower(term), "xterm-kitty") {
-        return true
-    }
-    if strings.Contains(strings.ToLower(termProgram), "warp") {
-        return true
-    }
-    if strings.Contains(strings.ToLower(term), "wayst") {
-        return true
-    }
-    if strings.Contains(strings.ToLower(termProgram), "wezterm") ||
-        strings.Contains(strings.ToLower(term), "wezterm") {
-        return true
-    }
+	if strings.Contains(strings.ToLower(term), "ghostty") {
+		return true
+	}
+	if konsoleVersion != "" {
+		return true
+	}
+	if strings.HasPrefix(strings.ToLower(term), "xterm-kitty") {
+		return true
+	}
+	if strings.Contains(strings.ToLower(termProgram), "warp") {
+		return true
+	}
+	if strings.Contains(strings.ToLower(term), "wayst") {
+		return true
+	}
+	if strings.Contains(strings.ToLower(termProgram), "wezterm") ||
+		strings.Contains(strings.ToLower(term), "wezterm") {
+		return true
+	}
 
-    return false
+	return false
+}
+
+func FormatAiringTs(seconds int64) string {
+	d := time.Until(time.Unix(seconds, 0))
+	if seconds <= 0 {
+		return "—"
+	}
+
+	days := d / (24 * time.Hour)
+	hours := (d % (24 * time.Hour)) / time.Hour
+	mins := (d % time.Hour) / time.Minute
+
+	return fmt.Sprintf("%dd %02dh %02dm", days, hours, mins)
 }

@@ -15,6 +15,10 @@ type ListCollection struct {
 				Volumes     *int   `json:"volumes"`
 				Episodes    *int   `json:"episodes"`
 				MediaFormat string `json:"format"`
+				NextAiringEpisode struct {
+					AiringAt int64 `json:"airingAt"`
+					TimeUntilAiring int64 `json:"timeUntilAiring"`
+				} `json:"nextAiringEpisode"`
 			} `json:"media"`
 		} `json:"entries"`
 	} `json:"lists"`
