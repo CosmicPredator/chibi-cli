@@ -42,7 +42,8 @@ export default defineConfig({
           { text: "ls", link: "/02_cli_guide/ls" },
           { text: "search", link: "/02_cli_guide/search" },
           { text: "add", link: "/02_cli_guide/add" },
-          { text: "update", link: "/02_cli_guide/update" }
+          { text: "update", link: "/02_cli_guide/update" },
+          { text: "nextdate", link: "/02_cli_guide/nextdate" }
         ]
       }
     ],
