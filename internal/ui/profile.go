@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/CosmicPredator/chibi/internal"
+	"github.com/CosmicPredator/chibi/internal/theme"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -44,8 +45,9 @@ func (p *ProfileUI) Render() error {
 	}
 
 	// define styles for both key and value string
-	keyStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF79C6"))
-	valueStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#8BE9FD"))
+	palette := theme.Current()
+	keyStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(palette.KeyText))
+	valueStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(palette.ValueText))
 
 	var sb strings.Builder
 
@@ -54,13 +56,13 @@ func (p *ProfileUI) Render() error {
 	for _, kv := range dataSlice {
 		if internal.CanSupportKittyGP() {
 			fmt.Fprintf(&sb, "%*s%s : %s\n",
-						20, "",
-						keyStyle.MarginRight(maxKeyLen-len(kv.Key)).Render(kv.Key),
-						valueStyle.Render(kv.Value))
+				20, "",
+				keyStyle.MarginRight(maxKeyLen-len(kv.Key)).Render(kv.Key),
+				valueStyle.Render(kv.Value))
 		} else {
 			fmt.Fprintf(&sb, "%s : %s\n",
-						keyStyle.MarginRight(maxKeyLen-len(kv.Key)).Render(kv.Key),
-						valueStyle.Render(kv.Value))
+				keyStyle.MarginRight(maxKeyLen-len(kv.Key)).Render(kv.Key),
+				valueStyle.Render(kv.Value))
 		}
 	}
 
