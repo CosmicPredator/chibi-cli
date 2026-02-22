@@ -7,6 +7,7 @@ import (
 
 	"github.com/CosmicPredator/chibi/internal"
 	"github.com/CosmicPredator/chibi/internal/api/responses"
+	"github.com/CosmicPredator/chibi/internal/theme"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -15,13 +16,14 @@ type MediaSearchUI struct {
 }
 
 type MediaSearchResult struct {
-	Id string
-	Title string
+	Id     string
+	Title  string
 	Format string
-	Score string
+	Score  string
 }
 
 func (l *MediaSearchUI) renderColumn(entries ...*MediaSearchResult) string {
+	palette := theme.Current()
 	col := func(w int) lipgloss.Style {
 		return lipgloss.NewStyle().Width(w).MarginRight(2).Align(lipgloss.Right)
 	}
@@ -33,8 +35,8 @@ func (l *MediaSearchUI) renderColumn(entries ...*MediaSearchResult) string {
 		col(0),
 	}
 
-	headerStyle := func (style lipgloss.Style) lipgloss.Style {
-		return style.MarginBottom(1).Underline(true).Bold(true).Foreground(lipgloss.ANSIColor(5))
+	headerStyle := func(style lipgloss.Style) lipgloss.Style {
+		return style.MarginBottom(1).Underline(true).Bold(true).Foreground(lipgloss.Color(palette.TableHeader))
 	}
 
 	var sb strings.Builder
@@ -48,9 +50,9 @@ func (l *MediaSearchUI) renderColumn(entries ...*MediaSearchResult) string {
 	sb.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, header...) + "\n")
 	for _, entry := range entries {
 		row := []string{
-			styles[0].Foreground(lipgloss.ANSIColor(6)).Render(entry.Id),
-			styles[1].Foreground(lipgloss.ANSIColor(2)).Render(entry.Format),
-			styles[2].Foreground(lipgloss.ANSIColor(3)).Render(entry.Score),
+			styles[0].Foreground(lipgloss.Color(palette.TableID)).Render(entry.Id),
+			styles[1].Foreground(lipgloss.Color(palette.TableFormat)).Render(entry.Format),
+			styles[2].Foreground(lipgloss.Color(palette.TableMetric)).Render(entry.Score),
 			styles[3].Render(entry.Title),
 		}
 		sb.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, row...) + "\n")
@@ -72,10 +74,10 @@ func (ms *MediaSearchUI) Render() error {
 		}
 
 		rows = append(rows, &MediaSearchResult{
-			Id: strconv.Itoa(media.Id),
-			Title: media.Title.UserPreferred,
+			Id:     strconv.Itoa(media.Id),
+			Title:  media.Title.UserPreferred,
 			Format: internal.MediaFormatFormatter(media.MediaFormat),
-			Score: averageScore,
+			Score:  averageScore,
 		})
 	}
 
