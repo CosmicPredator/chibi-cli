@@ -88,7 +88,12 @@ chibi login
 ```
 
 ### Themes
-Chibi supports built-in themes for CLI colors.
+Chibi loads themes from `DATA_DIR/themes` using TOML files.
+
+`DATA_DIR` is resolved the same way as local config storage:
+- `CHIBI_DATA_PATH` (preferred)
+- `CHIBI_PATH` (legacy fallback)
+- OS config directory fallback
 
 - Show active theme and available themes:
   ```bash
@@ -102,6 +107,9 @@ Chibi supports built-in themes for CLI colors.
   ```bash
   CHIBI_THEME=sunset chibi profile
   ```
+
+Each theme file in `DATA_DIR/themes/*.toml` should include all color keys.
+Example themes are available in the repository `themes/` directory.
 
 ## Documentation
 You can check the docs [here](https://chibi-cli.pages.dev/).
