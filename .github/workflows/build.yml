@@ -58,6 +58,10 @@ jobs:
             User aur
           EOF
           ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
+
+      - name: Debug SSH
+        run: |
+          ssh -v aur@aur.archlinux.org || true
     
       - name: Extract version from tag
         id: version
