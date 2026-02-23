@@ -13,7 +13,17 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
+      
+      - name: Cache Go Modules
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: go-mod-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            go-mod-${{ runner.os }}-
+      
       - name: Run Make
         run: make BUILD_TYPE=DEBUG
 
