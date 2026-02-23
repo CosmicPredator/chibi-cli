@@ -75,7 +75,7 @@ jobs:
             sed -i "s/^pkgrel=.*/pkgrel=$next/" PKGBUILD
     
             # generate .SRCINFO as non-root
-            sudo -u builder makepkg --printsrcinfo > .SRCINFO
+            sudo -u builder bash -c "makepkg --printsrcinfo > .SRCINFO"
     
             # commit & push as root (has SSH)
             git config user.name "github-actions"
