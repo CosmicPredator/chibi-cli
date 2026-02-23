@@ -34,42 +34,51 @@ jobs:
           path: build/*
   
   publish_to_aur:
-    needs: build
-    runs-on: ubuntu-latest
-    container: archlinux:latest
-    steps:
-      - name: Checkout Source
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+      needs: build
+      runs-on: ubuntu-latest
+      container: archlinux:latest
     
-      - name: Install AUR tools
-        run: |
-          pacman -Syu --noconfirm base-devel git openssh
-      
-      - name: Update chibi-cli-git AUR
-        env:
-          GIT_SSH_COMMAND: "ssh -i /root/.ssh/aur -o UserKnownHostsFile=/root/.ssh/known_hosts -o StrictHostKeyChecking=yes"
-        run: |
-          set -e
-
-          install -dm700 /root/.ssh
-          echo "${{ secrets.AUR_KEY }}" > /root/.ssh/aur
-          chmod 600 /root/.ssh/aur
-
-          ssh-keyscan aur.archlinux.org > /root/.ssh/known_hosts
-          chmod 644 /root/.ssh/known_hosts
-
-          git clone aur@aur.archlinux.org:chibi-cli-git.git
-          cd chibi-cli-git
-
-          current=$(grep '^pkgrel=' PKGBUILD | cut -d= -f2)
-          next=$((current+1))
-          sed -i "s/^pkgrel=.*/pkgrel=$next/" PKGBUILD
-
-          makepkg --printsrcinfo > .SRCINFO
-
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git commit -am "update" || echo "no changes"
-          git push
+      steps:
+        - name: Checkout Source
+          uses: actions/checkout@v6
+          with:
+            fetch-depth: 0
+    
+        - name: Install AUR tools
+          run: pacman -Syu --noconfirm base-devel git openssh sudo
+    
+        - name: Update chibi-cli-git AUR
+          env:
+            GIT_SSH_COMMAND: "ssh -i /root/.ssh/aur -o UserKnownHostsFile=/root/.ssh/known_hosts -o StrictHostKeyChecking=yes"
+          run: |
+            set -e
+    
+            # create build user
+            useradd -m builder
+            echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+    
+            # SSH setup for root (git push)
+            install -dm700 /root/.ssh
+            echo "${{ secrets.AUR_KEY }}" > /root/.ssh/aur
+            chmod 600 /root/.ssh/aur
+            ssh-keyscan aur.archlinux.org > /root/.ssh/known_hosts
+            chmod 644 /root/.ssh/known_hosts
+    
+            # clone AUR repo
+            git clone aur@aur.archlinux.org:chibi-cli-git.git
+            chown -R builder:builder chibi-cli-git
+            cd chibi-cli-git
+    
+            # bump pkgrel
+            current=$(grep '^pkgrel=' PKGBUILD | cut -d= -f2)
+            next=$((current+1))
+            sed -i "s/^pkgrel=.*/pkgrel=$next/" PKGBUILD
+    
+            # generate .SRCINFO as non-root
+            sudo -u builder makepkg --printsrcinfo > .SRCINFO
+    
+            # commit & push as root (has SSH)
+            git config user.name "github-actions"
+            git config user.email "actions@github.com"
+            git commit -am "update" || echo "no changes"
+            git push
