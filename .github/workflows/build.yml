@@ -41,12 +41,15 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+      
+      - name: Generate PKGBUILD
+        run: python3 installer_scripts/generate_pkgbuild.py
 
       - name: Publish AUR package (GET)
         uses: KSXGitHub/github-actions-deploy-aur@v4.1.1
         with:
           pkgname: chibi-cli-git
-          pkgbuild: ./installer_scripts/aur/chibi-cli-git/PKGBUILD
+          pkgbuild: ./PKGBUILD
           commit_username: ${{ secrets.AUR_USERNAME }}
           commit_email: ${{ secrets.AUR_EMAIL }}
           ssh_private_key: ${{ secrets.AUR_KEY }}
