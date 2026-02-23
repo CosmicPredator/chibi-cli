@@ -47,41 +47,29 @@ jobs:
         run: |
           pacman -Syu --noconfirm base-devel git openssh
       
-      - name: Setup SSH for AUR
+      - name: Update chibi-cli-git AUR
+        env:
+          GIT_SSH_COMMAND: "ssh -i /root/.ssh/aur -o UserKnownHostsFile=/root/.ssh/known_hosts -o StrictHostKeyChecking=yes"
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.AUR_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          cat >> ~/.ssh/config << 'EOF'
-          Host aur.archlinux.org
-            IdentityFile ~/.ssh/id_rsa
-            User aur
-          EOF
-          ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
+          set -e
 
-      - name: Debug SSH
-        run: |
-          ssh -v aur@aur.archlinux.org || true
-    
-      - name: Extract version from tag
-        id: version
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-      
-      - name: Update chibi-git AUR
-        run: |
+          install -dm700 /root/.ssh
+          echo "${{ secrets.AUR_KEY }}" > /root/.ssh/aur
+          chmod 600 /root/.ssh/aur
+
+          ssh-keyscan aur.archlinux.org > /root/.ssh/known_hosts
+          chmod 644 /root/.ssh/known_hosts
+
           git clone aur@aur.archlinux.org:chibi-cli-git.git
           cd chibi-cli-git
-      
-          # bump pkgrel to trigger rebuild
+
           current=$(grep '^pkgrel=' PKGBUILD | cut -d= -f2)
           next=$((current+1))
           sed -i "s/^pkgrel=.*/pkgrel=$next/" PKGBUILD
-      
+
           makepkg --printsrcinfo > .SRCINFO
-      
+
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git commit -am "update"
+          git commit -am "update" || echo "no changes"
           git push
