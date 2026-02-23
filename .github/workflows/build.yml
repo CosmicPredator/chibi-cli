@@ -36,6 +36,7 @@ jobs:
   publish_to_aur:
     needs: build
     runs-on: ubuntu-latest
+    container: archlinux:latest
     steps:
       - name: Checkout Source
         uses: actions/checkout@v6
@@ -44,8 +45,7 @@ jobs:
     
       - name: Install AUR tools
         run: |
-          sudo apt-get update
-          sudo apt-get install -y git openssh-client makepkg
+          pacman -Syu --noconfirm base-devel git openssh
       
       - name: Setup SSH for AUR
         run: |
