@@ -48,8 +48,8 @@ jobs:
           pkgname: chibi-cli-git
           pkgbuild: ./installer_scripts/aur/chibi-cli-git/PKGBUILD
           commit_username: ${{ secrets.AUR_USERNAME }}
-          commit_email: "cosmicpredator@proton.me"
-          ssh_private_key: ${{ secrets.AUR_EMAIL }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_KEY }}
           commit_message: Update AUR package
           ssh_keyscan_types: rsa,ecdsa,ed25519
 
