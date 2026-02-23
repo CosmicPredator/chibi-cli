@@ -15,7 +15,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Make
-        run: make BUILD_TYPE=RELEASE
+        run: make BUILD_TYPE=DEBUG
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -59,7 +59,7 @@ jobs:
       - name: Update chibi-git AUR
         run: |
           git clone ssh://aur@aur.archlinux.org/chibi-cli-git.git
-          cd chibi-git
+          cd chibi-cli-git
       
           # bump pkgrel to trigger rebuild
           current=$(grep '^pkgrel=' PKGBUILD | cut -d= -f2)
