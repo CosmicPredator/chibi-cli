@@ -46,10 +46,10 @@ jobs:
         uses: KSXGitHub/github-actions-deploy-aur@v4.1.1
         with:
           pkgname: chibi-cli-git
-          pkgbuild: ./installer_scripts/aur/chibi-cli-git/PGKBUILD
-          commit_username: "github-actions"
+          pkgbuild: ./installer_scripts/aur/chibi-cli-git/PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
           commit_email: "cosmicpredator@proton.me"
-          ssh_private_key: ${{ secrets.AUR_KEY }}
+          ssh_private_key: ${{ secrets.AUR_EMAIL }}
           commit_message: Update AUR package
           ssh_keyscan_types: rsa,ecdsa,ed25519
 
