@@ -50,11 +50,11 @@ jobs:
       - name: Setup SSH for AUR
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.AUR_KEY }}" > ~/.ssh/rsa_aur
-          chmod 600 ~/.ssh/rsa_aur
+          echo "${{ secrets.AUR_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
           cat >> ~/.ssh/config << 'EOF'
           Host aur.archlinux.org
-            IdentityFile ~/.ssh/rsa_aur
+            IdentityFile ~/.ssh/id_rsa
             User aur
           EOF
           ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
