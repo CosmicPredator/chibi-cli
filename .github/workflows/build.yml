@@ -42,6 +42,12 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.AUR_KEY }}" > ~/.ssh/rsa_aur
           chmod 600 ~/.ssh/rsa_aur
+          cat >> ~/.ssh/config << 'EOF'
+          Host aur.archlinux.org
+            IdentityFile ~/.ssh/rsa_aur
+            User aur
+            IdentitiesOnly yes
+          EOF
           ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
     
       - name: Extract version from tag
