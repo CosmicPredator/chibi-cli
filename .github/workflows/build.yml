@@ -32,53 +32,26 @@ jobs:
         with: 
           name: build_artifacts
           path: build/*
-  
+
   publish_to_aur:
-      needs: build
-      runs-on: ubuntu-latest
-      container: archlinux:latest
-    
-      steps:
-        - name: Checkout Source
-          uses: actions/checkout@v6
-          with:
-            fetch-depth: 0
-    
-        - name: Install AUR tools
-          run: pacman -Syu --noconfirm base-devel git openssh sudo
-    
-        - name: Update chibi-cli-git AUR
-          env:
-            GIT_SSH_COMMAND: "ssh -i /root/.ssh/aur -o UserKnownHostsFile=/root/.ssh/known_hosts -o StrictHostKeyChecking=yes"
-          run: |
-            set -e
-    
-            # create build user
-            useradd -m builder
-            echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-    
-            # SSH setup for root (git push)
-            install -dm700 /root/.ssh
-            echo "${{ secrets.AUR_KEY }}" > /root/.ssh/aur
-            chmod 600 /root/.ssh/aur
-            ssh-keyscan aur.archlinux.org > /root/.ssh/known_hosts
-            chmod 644 /root/.ssh/known_hosts
-    
-            # clone AUR repo
-            git clone aur@aur.archlinux.org:chibi-cli-git.git
-            chown -R builder:builder chibi-cli-git
-            cd chibi-cli-git
-    
-            # bump pkgrel
-            current=$(grep '^pkgrel=' PKGBUILD | cut -d= -f2)
-            next=$((current+1))
-            sed -i "s/^pkgrel=.*/pkgrel=$next/" PKGBUILD
-    
-            # generate .SRCINFO as non-root
-            sudo -u builder bash -c "makepkg --printsrcinfo > .SRCINFO"
-    
-            # commit & push as root (has SSH)
-            git config user.name "github-actions"
-            git config user.email "actions@github.com"
-            git commit -am "update" || echo "no changes"
-            git push
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Publish AUR package (GET)
+        uses: KSXGitHub/github-actions-deploy-aur@v4.1.1
+        with:
+          pkgname: chibi-cli-git
+          pkgbuild: ./installer_scripts/aur/chibi-cli-git/PGKBUILD
+          commit_username: "github-actions"
+          commit_email: "cosmicpredator@proton.me"
+          ssh_private_key: ${{ secrets.AUR_KEY }}
+          commit_message: Update AUR package
+          ssh_keyscan_types: rsa,ecdsa,ed25519
+
+      
+      
