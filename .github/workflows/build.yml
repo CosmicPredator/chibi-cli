@@ -56,7 +56,6 @@ jobs:
           Host aur.archlinux.org
             IdentityFile ~/.ssh/rsa_aur
             User aur
-            IdentitiesOnly yes
           EOF
           ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
     
