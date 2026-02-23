@@ -67,7 +67,7 @@ jobs:
       
       - name: Update chibi-git AUR
         run: |
-          git clone ssh://aur@aur.archlinux.org/chibi-cli-git.git
+          git clone aur@aur.archlinux.org:chibi-cli-git.git
           cd chibi-cli-git
       
           # bump pkgrel to trigger rebuild
