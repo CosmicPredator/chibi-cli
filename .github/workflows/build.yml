@@ -43,7 +43,7 @@ jobs:
           fetch-depth: 0
       
       - name: Generate PKGBUILD
-        run: python3 installer_scripts/generate_pkgbuild.py
+        run: python3 ./installer_scripts/generate_pkgbuild.py
 
       - name: Publish AUR package (GET)
         uses: KSXGitHub/github-actions-deploy-aur@v4.1.1
