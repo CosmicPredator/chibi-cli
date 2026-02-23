@@ -5,7 +5,7 @@ import subprocess
 
 pkgname = "chibi-cli-git"
 _pkgname = "chibi-cli"
-pkgdesc = "Chibi for AniList - A lightweight anime & manga tracker CLI app powered by AniList."
+pkgdesc = "Chibi for AniList - A lightweight anime & manga tracker CLI app powered by AniList (Upstream GIT)."
 arch = ["x86_64"]
 url = "https://chibi-cli.pages.dev/"
 git_url = "https://github.com/CosmicPredator/chibi-cli"
