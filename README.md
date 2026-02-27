@@ -120,6 +120,13 @@ Contributions are heartily welcomed...!
 Please refer to the [pull request guide](https://github.com/CosmicPredator/chibi-cli/blob/develop/.github/PULL_REQUEST_TEMPLATE.md) 
 before creating a pull request. 
 
+## Contributors
+ 
+<a href="https://github.com/cosmicpredator/chibi-cli/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=cosmicpredator/chibi-cli" />
+</a>
+
+The above people have contributed to chibi-cli, I really appreciate them for taking interest and taking their time to contributing to this project.
 ## Special Thanks
 This project is not possible without the following libraries,
 
