@@ -1,19 +1,31 @@
 name: Build (Multiple Arch)
 
 on:
-  pull_request:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   build:
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    #if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
+      
+      - name: Cache Go Modules
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: go-mod-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            go-mod-${{ runner.os }}-
+      
       - name: Run Make
         run: make BUILD_TYPE=DEBUG
 
@@ -22,3 +34,29 @@ jobs:
         with: 
           name: build_artifacts
           path: build/*
+
+  publish_to_aur:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      
+      - name: Generate PKGBUILD
+        run: python3 installer_scripts/generate_pkgbuild_git.py
+
+      - name: Publish AUR package (GET)
+        uses: KSXGitHub/github-actions-deploy-aur@v4.1.1
+        with:
+          pkgname: chibi-cli-git
+          pkgbuild: ./PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_KEY }}
+          commit_message: Update AUR package
+          ssh_keyscan_types: rsa,ecdsa,ed25519
+
+      
+      
