@@ -17,7 +17,7 @@ To uninstall chibi,
 ```shell
 $ curl -sSL https://raw.githubusercontent.com/CosmicPredator/chibi-cli/refs/heads/develop/install.sh | sudo bash -s -- --uninstall
 ```
-you can find the script [here](https://github.com/CosmicPredator/chibi-cli/blob/develop/install.sh).
+you can find the script [here](https://github.com/CosmicPredator/chibi-cli/blob/main/install.sh).
 
 
 ## Ubuntu / Debian
