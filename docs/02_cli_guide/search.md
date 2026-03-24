@@ -53,6 +53,18 @@ $ chibi search "Naruto" --type anime --page 3
 ```
 This command will return up to 3 anime results for the query `"Naruto"`.
 
+### `--json`
+Outputs search results in a structured JSON format.
+
+The JSON output includes:
+- `id`: The AniList Media ID
+- `titles`: A nested object containing `romaji`, `english`, and `native` titles
+
+#### Example:
+```bash
+$ chibi search "One Piece" --json
+```
+
 ## Defaults
 - The default `type` is `anime`.
 - The default `page` is 10 results.
