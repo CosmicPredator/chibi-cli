@@ -22,6 +22,24 @@ Provides help information for the `chibi profile` command. Use this flag to disp
 $ chibi profile --help
 ```
 
+### `-j, --json`
+Outputs your profile information in a structured JSON format.
+
+The JSON output includes:
+- `id`: Your AniList user ID
+- `name`: Your username
+- `totalAnime`: Your total anime count
+- `totalManga`: Your total manga count
+- `minutesWatched`: Your total minutes watched
+- `chaptersRead`: Your total chapters read
+- `avatarUrl`: The URL to your profile avatar
+- `siteUrl`: The URL to your AniList profile page
+
+#### Example:
+```bash
+$ chibi profile --json
+```
+
 ## Requirements
 This command requires you to be logged in to your AniList account. If you are not logged in, the command will prompt you to do so before retrieving your profile information.
 

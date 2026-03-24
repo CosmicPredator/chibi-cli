@@ -9,7 +9,7 @@ import (
 	"github.com/CosmicPredator/chibi/internal/ui"
 )
 
-func HandleMediaInfo(id int) error {
+func HandleMediaInfo(id int, jsonOutput bool) error {
 	var mediaInfo *responses.MediaInfo
 	var err error
 	
@@ -44,21 +44,23 @@ func HandleMediaInfo(id int) error {
 	}()
 	
 	mediaInfoUI := &ui.MediaInfoUI{
-		Id: mediaInfo.Data.Media.ID,
-		MalId: mediaInfo.Data.Media.IDMal,
-		Score: mediaInfo.Data.Media.MeanScore,
-		EnglishTitle: mediaInfo.Data.Media.Title.English,
-		RomajiTitle: mediaInfo.Data.Media.Title.Romaji,
-		CoverImage: mediaInfo.Data.Media.CoverImage.ExtraLarge,
-		NativeTitle: mediaInfo.Data.Media.Title.Native,
-		IsAnime: isAnime,
+		Id:             mediaInfo.Data.Media.ID,
+		MalId:          mediaInfo.Data.Media.IDMal,
+		Score:          mediaInfo.Data.Media.MeanScore,
+		EnglishTitle:   mediaInfo.Data.Media.Title.English,
+		RomajiTitle:    mediaInfo.Data.Media.Title.Romaji,
+		CoverImage:     mediaInfo.Data.Media.CoverImage.ExtraLarge,
+		NativeTitle:    mediaInfo.Data.Media.Title.Native,
+		IsAnime:        isAnime,
 		ChapterEpisode: chapEp,
 		VolumeDuration: durVol,
-		Genres: strings.Join(mediaInfo.Data.Media.Genres, ", "),
-		Tags: tags,
-		Studios: studios,
-		Format: mediaInfo.Data.Media.Format,
-		Description: mediaInfo.Data.Media.Description,
+		Genres:         strings.Join(mediaInfo.Data.Media.Genres, ", "),
+		Tags:           tags,
+		Studios:        studios,
+		Format:         mediaInfo.Data.Media.Format,
+		Description:    mediaInfo.Data.Media.Description,
+		Synonyms:       mediaInfo.Data.Media.Synonyms,
+		JSON:           jsonOutput,
 	}
 	
 	return mediaInfoUI.Render()

@@ -12,7 +12,7 @@ var listMediaType string
 var listStatus string
 
 func handleLs(cmd *cobra.Command, args []string) {
-	err := viewmodel.HandleMediaList(listMediaType, listStatus)
+	err := viewmodel.HandleMediaList(listMediaType, listStatus, GlobalJSON)
 	if err != nil {
 		fmt.Println(ui.ErrorText(err))
 	}

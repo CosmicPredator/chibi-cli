@@ -63,6 +63,20 @@ chibi list --status watching --type anime
 
 This command will display a list of anime that you are currently watching.
 
+### `-j, --json`
+Outputs the list in a structured JSON format. This is particularly useful for automation scripts and programmatic data processing.
+
+The JSON output includes:
+- `id`: The AniList Media ID
+- `status`: The current status (e.g., WATCHING, COMPLETED)
+- `progress`: Your current episode or chapter progress
+- `titles`: A nested object containing `romaji`, `english`, and `native` titles
+
+#### Example:
+```bash
+$ chibi list --json
+```
+
 ## Defaults
 - The default `status` is `watching`.
 - The default `type` is `anime`.

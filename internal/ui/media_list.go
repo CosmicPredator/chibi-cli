@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -14,6 +15,7 @@ import (
 type MediaListUI struct {
 	MediaType string
 	MediaList *responses.MediaList
+	JSON      bool
 }
 
 type MediaListEntry struct {
@@ -117,7 +119,7 @@ func (l *MediaListUI) Render() error {
 				progress = fmt.Sprintf("%v/%v", entry.Progress, total)
 			}
 
-			if list.Status == "REPEATING" {
+			if !l.JSON && list.Status == "REPEATING" {
 				entry.Media.Title.UserPreferred = lipgloss.
 					NewStyle().
 					Foreground(lipgloss.Color(palette.TableRepeating)).
@@ -134,6 +136,47 @@ func (l *MediaListUI) Render() error {
 		}
 	}
 
+	if l.JSON {
+		return l.renderJSON(selectedList)
+	}
+
 	fmt.Println(l.renderColumn(internal.MediaType(l.MediaType), rows...))
+	return nil
+}
+
+func (l *MediaListUI) renderJSON(selectedList responses.ListCollection) error {
+	type Title struct {
+		Romaji  string `json:"romaji"`
+		English string `json:"english"`
+		Native  string `json:"native"`
+	}
+	type MediaEntry struct {
+		Id       int    `json:"id"`
+		Status   string `json:"status"`
+		Progress int    `json:"progress"`
+		Titles   Title  `json:"titles"`
+	}
+
+	var output []MediaEntry
+	for _, list := range selectedList.Lists {
+		for _, entry := range list.Entries {
+			output = append(output, MediaEntry{
+				Id:       entry.Media.Id,
+				Status:   list.Status,
+				Progress: entry.Progress,
+				Titles: Title{
+					Romaji:  entry.Media.Title.Romaji,
+					English: entry.Media.Title.English,
+					Native:  entry.Media.Title.Native,
+				},
+			})
+		}
+	}
+
+	jsonData, err := json.MarshalIndent(output, "", "  ")
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(jsonData))
 	return nil
 }

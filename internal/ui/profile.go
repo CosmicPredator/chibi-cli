@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -11,17 +12,26 @@ import (
 )
 
 type ProfileUI struct {
-	Id             int
-	Name           string
-	TotalAnime     int
-	TotalManga     int
-	MinutesWatched int
-	ChaptersRead   int
-	AvatarUrl      string
-	SiteUrl        string
+	Id             int    `json:"id"`
+	Name           string `json:"name"`
+	TotalAnime     int    `json:"totalAnime"`
+	TotalManga     int    `json:"totalManga"`
+	MinutesWatched int    `json:"minutesWatched"`
+	ChaptersRead   int    `json:"chaptersRead"`
+	AvatarUrl      string `json:"avatarUrl"`
+	SiteUrl        string `json:"siteUrl"`
+	JSON           bool   `json:"-"`
 }
 
 func (p *ProfileUI) Render() error {
+	if p.JSON {
+		jsonData, err := json.MarshalIndent(p, "", "  ")
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(jsonData))
+		return nil
+	}
 	// convert minutes to days
 	daysWatched := float32(p.MinutesWatched) / 1440
 

@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -13,6 +14,7 @@ import (
 
 type MediaSearchUI struct {
 	MediaList *[]responses.MediaSearchList
+	JSON      bool
 }
 
 type MediaSearchResult struct {
@@ -81,6 +83,41 @@ func (ms *MediaSearchUI) Render() error {
 		})
 	}
 
+	if ms.JSON {
+		return ms.renderJSON()
+	}
+
 	fmt.Println(ms.renderColumn(rows...))
+	return nil
+}
+
+func (ms *MediaSearchUI) renderJSON() error {
+	type Title struct {
+		Romaji  string `json:"romaji"`
+		English string `json:"english"`
+		Native  string `json:"native"`
+	}
+	type SearchEntry struct {
+		Id     int   `json:"id"`
+		Titles Title `json:"titles"`
+	}
+
+	var output []SearchEntry
+	for _, media := range *ms.MediaList {
+		output = append(output, SearchEntry{
+			Id: media.Id,
+			Titles: Title{
+				Romaji:  media.Title.Romaji,
+				English: media.Title.English,
+				Native:  media.Title.Native,
+			},
+		})
+	}
+
+	jsonData, err := json.MarshalIndent(output, "", "  ")
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(jsonData))
 	return nil
 }

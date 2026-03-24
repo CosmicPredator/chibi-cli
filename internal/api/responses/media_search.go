@@ -4,6 +4,9 @@ type MediaSearchList struct {
 	Id    int `json:"id"`
 	Title struct {
 		UserPreferred string `json:"userPreferred"`
+		Romaji        string `json:"romaji"`
+		English       string `json:"english"`
+		Native        string `json:"native"`
 	} `json:"title"`
 	AverageScore *float64 `json:"averageScore"`
 	MediaType    string   `json:"type"`

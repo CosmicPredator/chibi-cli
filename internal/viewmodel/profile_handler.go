@@ -10,7 +10,7 @@ import (
 
 // get's user profile information form API and
 // displays it
-func HandleProfile() error {
+func HandleProfile(jsonOutput bool) error {
 	var profile *responses.Profile
 	var err error
 
@@ -33,6 +33,7 @@ func HandleProfile() error {
 		ChaptersRead:   profile.Data.Viewer.Statistics.Manga.ChaptersRead,
 		SiteUrl:        profile.Data.Viewer.SiteUrl,
 		AvatarUrl:      profile.Data.Viewer.Avatar.Large,
+		JSON:           jsonOutput,
 	}
 
 	// display profile UI

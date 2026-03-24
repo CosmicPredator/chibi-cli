@@ -10,13 +10,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func handleMediaInfo(_ *cobra.Command, args []string) {
+func handleMediaInfo(cmd *cobra.Command, args []string) {
 	id, err := strconv.Atoi(args[0])
 	if err != nil {
 		fmt.Println(ui.ErrorText(errors.New("invalid media id provided")))
 	}
 	
-	err = viewmodel.HandleMediaInfo(id)
+	err = viewmodel.HandleMediaInfo(id, GlobalJSON)
 	if err != nil {
 		fmt.Println(ui.ErrorText(err))
 	}

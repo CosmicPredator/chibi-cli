@@ -10,6 +10,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var GlobalJSON bool
+
 var rootCmd = &cobra.Command{
 	Use:  "chibi",
 	Long: "Chibi for AniList - A lightweight anime & manga tracker CLI app powered by AniList.\nRead the documentation at https://chibi-cli.pages.dev/",
@@ -34,6 +36,7 @@ func Execute(version string) {
 		mediaInfoCmd,
 		themeCmd,
 	)
+	rootCmd.PersistentFlags().BoolVarP(&GlobalJSON, "json", "j", false, "Output in JSON format")
 	if err := fang.Execute(
 		context.TODO(),
 		rootCmd,

@@ -10,6 +10,7 @@ type MediaInfo struct {
 				Romaji  string `json:"romaji"`
 				Native  string `json:"native"`
 			} `json:"title"`
+			Synonyms []string `json:"synonyms"`
 			MeanScore  int `json:"meanScore"`
 			CoverImage struct {
 				ExtraLarge string `json:"extraLarge"`
