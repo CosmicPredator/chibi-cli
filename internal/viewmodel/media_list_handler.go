@@ -14,7 +14,7 @@ import (
 )
 
 // handler func for "chibi ls" command
-func HandleMediaList(mediaType, mediaStatus string) error {
+func HandleMediaList(mediaType, mediaStatus string, jsonOutput bool) error {
 	mediaType = internal.MediaTypeEnumMapper(mediaType)
 	mediaStatus = internal.MediaStatusEnumMapper(mediaStatus)
 
@@ -60,6 +60,7 @@ func HandleMediaList(mediaType, mediaStatus string) error {
 	mediaListUI := ui.MediaListUI{
 		MediaType: mediaType,
 		MediaList: mediaList,
+		JSON:      jsonOutput,
 	}
 
 	err = mediaListUI.Render()

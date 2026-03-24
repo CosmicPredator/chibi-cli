@@ -10,7 +10,7 @@ import (
 )
 
 // handler func to handle "chibi search" command
-func HandleMediaSearch(searchQuery string, mediaType string, perPage int) error {
+func HandleMediaSearch(searchQuery string, mediaType string, perPage int, jsonOutput bool) error {
 	mediaType = internal.MediaTypeEnumMapper(mediaType)
 
 	var err error
@@ -28,6 +28,7 @@ func HandleMediaSearch(searchQuery string, mediaType string, perPage int) error 
 	// display the result
 	mediaSearchUI := ui.MediaSearchUI{
 		MediaList: &searchResult.Data.Page.Media,
+		JSON:      jsonOutput,
 	}
 	err = mediaSearchUI.Render()
 	return err
