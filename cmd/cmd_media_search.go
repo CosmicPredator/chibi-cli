@@ -20,12 +20,11 @@ func handleMediaSearch(cmd *cobra.Command, args []string) {
 	}
 
 	combinedQuery := strings.Join(args, " ")
-	jsonOutput, _ := cmd.Flags().GetBool("json")
 	err := viewmodel.HandleMediaSearch(
 		combinedQuery,
 		searchMediaType,
 		pageSize,
-		jsonOutput,
+		GlobalJSON,
 	)
 
 	if err != nil {

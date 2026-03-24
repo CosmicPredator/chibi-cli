@@ -16,8 +16,7 @@ func handleMediaInfo(cmd *cobra.Command, args []string) {
 		fmt.Println(ui.ErrorText(errors.New("invalid media id provided")))
 	}
 	
-	jsonOutput, _ := cmd.Flags().GetBool("json")
-	err = viewmodel.HandleMediaInfo(id, jsonOutput)
+	err = viewmodel.HandleMediaInfo(id, GlobalJSON)
 	if err != nil {
 		fmt.Println(ui.ErrorText(err))
 	}

@@ -63,7 +63,7 @@ chibi list --status watching --type anime
 
 This command will display a list of anime that you are currently watching.
 
-### `--json`
+### `-j, --json`
 Outputs the list in a structured JSON format. This is particularly useful for automation scripts and programmatic data processing.
 
 The JSON output includes:

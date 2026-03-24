@@ -22,7 +22,7 @@ Provides help information for the `chibi profile` command. Use this flag to disp
 $ chibi profile --help
 ```
 
-### `--json`
+### `-j, --json`
 Outputs your profile information in a structured JSON format.
 
 The JSON output includes:

@@ -53,7 +53,7 @@ $ chibi search "Naruto" --type anime --page 3
 ```
 This command will return up to 3 anime results for the query `"Naruto"`.
 
-### `--json`
+### `-j, --json`
 Outputs search results in a structured JSON format.
 
 The JSON output includes:

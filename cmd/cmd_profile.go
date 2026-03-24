@@ -9,8 +9,7 @@ import (
 )
 
 func handleProfile(cmd *cobra.Command, args []string) {
-	jsonOutput, _ := cmd.Flags().GetBool("json")
-	err := viewmodel.HandleProfile(jsonOutput)
+	err := viewmodel.HandleProfile(GlobalJSON)
 	if err != nil {
 		fmt.Println(ui.ErrorText(err))
 	}

@@ -17,7 +17,7 @@ $ chibi info [id] [flags]
 ### `-h, --help`
 Provides help information for the `chibi info` command.
 
-### `--json`
+### `-j, --json`
 Outputs the media information in a structured JSON format. This includes IDs, titles (romaji, english, native), synonyms, scores, progress, and full descriptions.
 
 #### Example:
