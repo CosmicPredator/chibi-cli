@@ -12,7 +12,8 @@ var listMediaType string
 var listStatus string
 
 func handleLs(cmd *cobra.Command, args []string) {
-	err := viewmodel.HandleMediaList(listMediaType, listStatus)
+	jsonOutput, _ := cmd.Flags().GetBool("json")
+	err := viewmodel.HandleMediaList(listMediaType, listStatus, jsonOutput)
 	if err != nil {
 		fmt.Println(ui.ErrorText(err))
 	}

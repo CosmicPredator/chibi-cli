@@ -34,6 +34,7 @@ func Execute(version string) {
 		mediaInfoCmd,
 		themeCmd,
 	)
+	rootCmd.PersistentFlags().Bool("json", false, "Output in JSON format")
 	if err := fang.Execute(
 		context.TODO(),
 		rootCmd,
