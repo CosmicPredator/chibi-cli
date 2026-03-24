@@ -6,6 +6,9 @@ const searchMediaQuery = `query($searchQuery: String, $perPage: Int, $mediaType:
             id
             title {
                 userPreferred
+                romaji
+                english
+                native
             }
 			type
             averageScore
@@ -24,6 +27,9 @@ const mediaListQuery = `query ($id: Int, $statusIn: [MediaListStatus]) {
 					id
 					title {
 						userPreferred
+						romaji
+						english
+						native
 					}
 					episodes
 					chapters
@@ -45,6 +51,9 @@ const mediaListQuery = `query ($id: Int, $statusIn: [MediaListStatus]) {
 					id
 					title {
 						userPreferred
+						romaji
+						english
+						native
 					}
 					episodes
 					chapters
@@ -85,6 +94,7 @@ const mediaInfoQuery = `query($id: Int) {
       romaji
       native
     }
+    synonyms
     meanScore
     coverImage {
       extraLarge
