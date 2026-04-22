@@ -32,7 +32,7 @@ func queryAnilist(query string, variables map[string]any) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	db, err := kvdb.Open()
 	if err != nil {
 		return nil, fmt.Errorf("unable to open database: %w", err)
@@ -124,13 +124,13 @@ func GetMediaInfo(id int) (*responses.MediaInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	var responseStruct responses.MediaInfo
 	err = json.Unmarshal(response, &responseStruct)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &responseStruct, nil
 }
 
@@ -152,7 +152,7 @@ func GetUserProfile() (*responses.Profile, error) {
 }
 
 func UpdateMediaEntry(params map[string]any) (*responses.MediaUpdateResponse, error) {
-	response, err := queryAnilist(mediaEntryUpdateMutation, params)
+	response, err := queryAnilist(mediaEntryUpdateMutation(params), params)
 	if err != nil {
 		return nil, err
 	}
