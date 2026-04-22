@@ -74,7 +74,7 @@ func init() {
 		"The number of episodes/chapter to update",
 	)
 	mediaUpdateCmd.Flags().StringVarP(
-		&updateStatus, "status", "s", "none", "Status of the media. Can be 'watching/w or reading/r', 'planning/p', 'completed/c', 'dropped/d', 'paused/ps'",
+		&updateStatus, "status", "s", "", "Status of the media. Can be 'watching/w or reading/r', 'planning/p', 'completed/c', 'dropped/d', 'paused/ps'",
 	)
 	mediaUpdateCmd.Flags().StringVarP(
 		&notes,
