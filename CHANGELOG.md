@@ -1,11 +1,71 @@
 ## ✨ What's New
-- Added `info` command to display media information.
 
-### ✨ Other Changes
-* Removed keyring dependencies and switched to database storage.
-* Bumped all dependencies to latest versions.
-* Updated docs to use chibi logo instead of the old GIF.
-* Updated build pipeline trigger rules.
+### 🎨 Theme System
+- **Added comprehensive theme support** with customizable color palettes
+- New `chibi theme` command to view and set active themes
+- Support for custom themes via TOML files in `DATA_DIR/themes`
+- Four built-in themes: `default`, `nord`, `sunset`, and `forest`
+- Environment variable override: `CHIBI_THEME` for temporary theme switching
+
+### 📊 JSON Output Support
+- **Added `-j, --json` flag** to all major commands for structured JSON output
+- `chibi ls --json` outputs media list with romaji, english, and native titles
+- `chibi search --json` outputs search results in JSON format
+- `chibi profile --json` outputs profile information as JSON
+- `chibi info --json` outputs detailed media information including synonyms
+
+### 📁 Data Directory Customization
+- **Custom data directory support** via environment variables
+- `CHIBI_DATA_PATH` (preferred) - set custom data storage location
+- `CHIBI_PATH` (legacy fallback) - for backward compatibility
+- Documentation updated with examples for both bash and PowerShell
+
+### 📚 Expanded Media Information
+- Added `synonyms` field to media info queries and responses
+- Extended title metadata: `romaji`, `english`, and `native` titles across all commands
+- Next airing episode information for anime (timestamps with countdown)
+- Fixed search query spacing (words now properly separated)
+
+### 🐧 AUR Package Support
+- **Added Arch Linux User Repository (AUR) integration**
+- New `chibi-cli-git` package for development/latest builds
+- New `chibi-cli-bin` package for pre-built releases
+- Automated PKGBUILD generation and AUR publishing in CI/CD
+
+### 📖 Documentation Improvements
+- New documentation pages for `info` and `theme` commands
+- Updated all command guides with JSON flag examples
+- Fixed documentation links (changed from develop to main branch)
+- Added contributors section to README
+- Custom data directory configuration guide
+
+### ⚙️ Build & Deployment
+- **Updated GitHub Actions workflow** for better build efficiency
+- Added Go module caching to improve build times
+- Changed trigger from pull_request to push on main branch
+- Added AUR publishing workflow step
+
+### 🔧 Code Quality & Refactoring
+- **Introduced theme system** with centralized color palette management
+- Separated theme colors from hardcoded hex values throughout UI
+- Added comprehensive unit tests for theme loading and persistence
+- Improved data path resolution with environment variable support
+- Refactored media list and search UI components for JSON support
+- Fixed indentation and formatting inconsistencies
+
+### 📦 Dependency Updates
+- Added `github.com/BurntSushi/toml v1.4.0` for theme file parsing
+- Bumped Go toolchain and various dependencies to latest versions
+- Removed unused dependencies to keep binary size minimal
 
 ### 🐛 Bug Fixes
-* Fixed spinner writing to `stdout` instead of `stderr`.
+- Fixed search media query handling (proper word spacing)
+- Fixed media list rendering to show only CURRENT and REPEATING statuses
+- Improved error handling for missing theme configurations
+- Fixed spinner color styling to use theme palette
+
+### 🎯 Other Changes
+- Added `APP_DIR_NAME` constant for consistent directory naming
+- Enhanced helper functions with new `FormatAiringTs()` for countdown display
+- Improved code organization with separate theme and path resolution modules
+- Added test coverage for data path resolution logic
