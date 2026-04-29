@@ -135,7 +135,7 @@ func handleNewAdditionAction(params MediaUpdateParams) error {
 // matches the total progress
 func handleMediaCompletedAction(params MediaUpdateParams, progress int) error {
 	defaultDate := fmt.Sprintf("%d/%02d/%d", time.Now().Day(), time.Now().Month(), time.Now().Year())
-	var currDate string 
+	var currDate string
 	var scoreString string
 	var notes string
 
@@ -240,14 +240,13 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 		return nil
 	}
 
-	
 	// get user id
 	db, err := kvdb.Open()
 	if err != nil {
 		return fmt.Errorf("unable to open databse: %w", err)
 	}
 	defer db.Close()
-	
+
 	userId, err := db.Get(context.TODO(), "user_id")
 	if err != nil {
 		return errors.New("not logged in. Please use \"chibi login\" to continue")
@@ -257,7 +256,7 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 	if err != nil {
 		return err
 	}
-	
+
 	current, total, err := getCurrentProgress(userIdInt, params.MediaId)
 	if err != nil {
 		return err
@@ -269,7 +268,10 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 		return err
 	}
 
-	status := internal.MediaStatusEnumMapper(params.Status)
+	status := ""
+	if strings.TrimSpace(params.Status) != "" {
+		status = internal.MediaStatusEnumMapper(params.Status)
+	}
 	if status == "COMPLETED" {
 		if *total != 0 && accumulatedProgress < *total {
 			var markAsCompleted string
@@ -303,19 +305,18 @@ func HandleMediaUpdate(params MediaUpdateParams) error {
 		}
 	}
 
-	var notes string
-	if len(params.Notes) > 0 {
-		notes = strings.ReplaceAll(params.Notes, `\n`, "\n")
-	}
-
 	// route 3
 	var response *responses.MediaUpdateResponse
 	err = ui.ActionSpinner("Updating entry...", func(ctx context.Context) error {
 		payload := map[string]any{
 			"id":       params.MediaId,
 			"progress": accumulatedProgress,
-			"status":   status,
-			"notes":    notes,
+		}
+		if status != "" {
+			payload["status"] = status
+		}
+		if strings.TrimSpace(params.Notes) != "" {
+			payload["notes"] = strings.ReplaceAll(params.Notes, `\n`, "\n")
 		}
 		if params.Score > 0 {
 			payload["score"] = params.Score
